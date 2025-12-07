@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from app_ui.student_ui.submenus_ui.ui_register_courses import Ui_RegisterCourses
 from student.submenus.class_view_sections import ViewSectionsWidget
 from helper_files.shared_utilities import show_msg
+from admin.class_admin_utilities import admin as admin_utils
 from student.class_student_utilities import StudentUtilities, db
 
 
@@ -26,6 +27,7 @@ class RegisterCoursesWidget(QWidget):
         # Load UI
         self.ui = Ui_RegisterCourses()
         self.ui.setupUi(self)
+        self.admin_utils = admin_utils
 
         # Utilities
         self.student_utils = StudentUtilities(db, student_id)
@@ -63,6 +65,7 @@ class RegisterCoursesWidget(QWidget):
         # Load initial table
         self.load_courses()
         self.format_table()
+        self.update_registration_label()
 
     # ============================
     # LOAD COURSES FROM DATABASE
@@ -79,6 +82,7 @@ class RegisterCoursesWidget(QWidget):
 
         self.all_courses = courses
         self.fill_table(courses)
+        self.update_registration_label()
 
     # ============================
     # FILL TABLE WITH COURSES
@@ -132,6 +136,8 @@ class RegisterCoursesWidget(QWidget):
                 item = table.item(i, col)
                 if item:
                     item.setToolTip(f"Prerequisites: {prereqs}")
+
+            self.update_registration_label()
 
     # ============================
     # SEARCH FILTER
@@ -242,6 +248,7 @@ class RegisterCoursesWidget(QWidget):
 
         # All selected courses are allowed and registration is open
         self.ui.buttonViewSections.setEnabled(True)
+        self.update_registration_label()
 
 
     # ============================
@@ -283,6 +290,24 @@ class RegisterCoursesWidget(QWidget):
 
         dialog.resize(900, 600)
         dialog.exec()
+
+
+        # ---------------- Registration status label ----------------
+    def update_registration_label(self):
+        """
+        Reads global registration flag from DB and updates labelRegistrationStatus.
+        """
+        try:
+            is_open = self.admin_utils.db.is_registration_open()
+        except Exception:
+            is_open = False  # fallback
+
+        if is_open:
+            self.ui.labelStatus.setText("Registration: OPEN")
+            self.ui.labelStatus.setStyleSheet("color: green; font-weight: bold;")
+        else:
+            self.ui.labelStatus.setText("Registration: CLOSED")
+            self.ui.labelStatus.setStyleSheet("color: red; font-weight: bold;")
 
 
 # ---------------- Run standalone ----------------

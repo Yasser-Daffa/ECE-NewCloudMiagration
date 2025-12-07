@@ -89,6 +89,10 @@ class Ui_RegisterCourses(object):
         self.buttonRefresh.setObjectName("buttonRefresh")
         self.filterLayout.addWidget(self.buttonRefresh)
         self.mainLayout.addWidget(self.filterFrame)
+        self.labelStatus = QtWidgets.QLabel(parent=RegisterCourses)
+        self.labelStatus.setStyleSheet("font-size: 18px; font-weight: bold; color: #2c3e50; background: transparent;")
+        self.labelStatus.setObjectName("labelStatus")
+        self.mainLayout.addWidget(self.labelStatus)
         self.tableFrame = QtWidgets.QFrame(parent=RegisterCourses)
         self.tableFrame.setStyleSheet("background-color: white; border-radius: 12px;")
         self.tableFrame.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
@@ -297,6 +301,7 @@ class Ui_RegisterCourses(object):
         self.labelTitle.setText(_translate("RegisterCourses", "Register Courses"))
         self.lineEditSearch.setPlaceholderText(_translate("RegisterCourses", "🔍  Search by Course name or code..."))
         self.buttonRefresh.setText(_translate("RegisterCourses", "🔄 Refresh"))
+        self.labelStatus.setText(_translate("RegisterCourses", "REGISTRATION STATUS: OPEN"))
         self.tableTitle.setText(_translate("RegisterCourses", "All Courses"))
         self.buttonViewSections.setText(_translate("RegisterCourses", " View Availabe Sections"))
         self.tableAllCourses.setSortingEnabled(True)
@@ -312,3 +317,13 @@ class Ui_RegisterCourses(object):
         item.setText(_translate("RegisterCourses", "LEVEL"))
         item = self.tableAllCourses.horizontalHeaderItem(5)
         item.setText(_translate("RegisterCourses", "PREREQUISITES"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    RegisterCourses = QtWidgets.QWidget()
+    ui = Ui_RegisterCourses()
+    ui.setupUi(RegisterCourses)
+    RegisterCourses.show()
+    sys.exit(app.exec())

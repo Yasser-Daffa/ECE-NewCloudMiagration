@@ -9,120 +9,47 @@ registrations, settings, login, and some helper checks.
 
 Now it is fully migrated to PostgreSQL (no SQLite).
 """
- 
-import time
+
 import psycopg2
-from database_files.cloud_database import get_pooled_connection
+from database_files.cloud_database import get_connection
+
+# Get a single shared "session pooler" connection + cursor from the cloud database
+con, cur = get_connection()
 
 
-# =========================================================
-# GLOBAL INITIAL CONNECTION (FROM THE POOL)
-# =========================================================
-def _create_initial_connection():
-    """
-    Creates a safe initial pooled connection.
-    Prevents startup crashes and allows reconnection later.
-    """
-    try:
-        con, cur = get_pooled_connection()
-        return con, cur, time.time()
-    except Exception as e:
-        print(f"[DB] Initial connection failed: {e}")
-        return None, None, 0
-
-
-con, cur, _last_used_global = _create_initial_connection()
-
-
-# =========================================================
-# DATABASE UTILITIES CLASS (BACKBONE)
-# =========================================================
 class DatabaseUtilities:
-    """
-    Preserves ALL original method names.
-    Adds automatic reconnection + fast pooled sessions.
-    """
-
-    _MAX_IDLE_TIME = 300  # 5 minutes
 
     def __init__(self, con, cur):
+        """
+        Initialize with an existing PostgreSQL connection and cursor.
+        In most cases you will pass the global `con` and `cur` from this module.
+        """
         self.con = con
         self.cur = cur
-        self._last_used = time.time()
 
-    # -----------------------------------------------------
-    # CONNECTION MANAGEMENT (NON-BREAKING, FULLY INTERNAL)
-    # -----------------------------------------------------
-    def ensure_connection(self):
-        """
-        Ensures the database connection is alive and fast.
-        Reconnects automatically when idle, broken, or closed.
-        """
-        now = time.time()
-
-        # If connection is None or closed
-        if self.con is None or self.con.closed != 0:
-            self._connect_fresh()
-            return
-
-        # Idle too long → reconnect
-        if now - self._last_used > self._MAX_IDLE_TIME:
-            self._connect_fresh()
-            return
-
-        # Ping the database
-        try:
-            self.cur.execute("SELECT 1;")
-        except Exception:
-            self._connect_fresh()
-            return
-
-        self._last_used = now
-
-    def _connect_fresh(self):
-        """
-        Pulls a new connection from the pool safely.
-        """
-        try:
-            self.con, self.cur = get_pooled_connection()
-            self._last_used = time.time()
-            print("[DB] Reconnected (fresh pooled connection).")
-        except Exception as e:
-            raise RuntimeError(f"[DB] Failed to reconnect: {e}")
-
-    # -----------------------------------------------------
-    # EXECUTION METHODS (UNTOUCHED INTERFACES)
-    # -----------------------------------------------------
-    def execute(self, query, params=()):
-        self.ensure_connection()
-        self.cur.execute(query, params)
+    def commit(self):
+        """Commit changes to the database."""
         self.con.commit()
-        self._last_used = time.time()
 
+    # ---------------------------------------------------------
+    # Generic helpers
+    # ---------------------------------------------------------
     def fetchone(self, query, params=()):
-        self.ensure_connection()
+        """Execute a query and return a single row."""
         self.cur.execute(query, params)
-        result = self.cur.fetchone()
-        self._last_used = time.time()
-        return result
+        return self.cur.fetchone()
 
     def fetchall(self, query, params=()):
-        self.ensure_connection()
+        """Execute a query and return all rows."""
         self.cur.execute(query, params)
-        result = self.cur.fetchall()
-        self._last_used = time.time()
-        return result
+        return self.cur.fetchall()
 
-    # -----------------------------------------------------
-    # LEGACY API COMPATIBILITY (MUST KEEP)
-    # -----------------------------------------------------
-    def commit(self):
-        self.ensure_connection()
+    def execute(self, query, params=()):
+        """
+        Execute an INSERT / UPDATE / DELETE query and commit.
+        """
+        self.cur.execute(query, params)
         self.con.commit()
-        self._last_used = time.time()
-
-
-
 
     # =========================================================
     # COURSES
