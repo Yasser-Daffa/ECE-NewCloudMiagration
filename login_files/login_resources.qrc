@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="qrc_images">
+    <file>../assets/images/close_eye_icon24.png</file>
+    <file>../assets/images/login_bg.png</file>
+    <file>../assets/images/open_eye_icon24.png</file>
+  </qresource>
+</RCC>

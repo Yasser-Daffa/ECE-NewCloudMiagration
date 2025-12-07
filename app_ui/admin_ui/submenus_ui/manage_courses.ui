@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ManageCourses</class>
+ <widget class="QWidget" name="ManageCourses">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>858</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Course</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #f5f7fa;</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>30</number>
+   </property>
+   <property name="leftMargin">
+    <number>40</number>
+   </property>
+   <property name="topMargin">
+    <number>40</number>
+   </property>
+   <property name="rightMargin">
+    <number>40</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="headerLayout">
+     <item>
+      <widget class="QLabel" name="labelTitle">
+       <property name="styleSheet">
+        <string notr="true">font-size: 28px; font-weight: bold; color: #2c3e50; background: transparent;</string>
+       </property>
+       <property name="text">
+        <string>Course Management</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="headerSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelTotalCoursesCount">
+       <property name="styleSheet">
+        <string notr="true">font-size: 16px;
+color: #4b0082;               /* deep purple text */
+font-weight: bold;
+background-color: #e6e0f8;    /* soft light purple background */
+padding: 8px 20px;
+border-radius: 20px;
+</string>
+       </property>
+       <property name="text">
+        <string>22 Total Courses</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="filterFrame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: white; border-radius: 12px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <layout class="QHBoxLayout" name="filterLayout">
+      <property name="leftMargin">
+       <number>25</number>
+      </property>
+      <property name="topMargin">
+       <number>15</number>
+      </property>
+      <property name="rightMargin">
+       <number>25</number>
+      </property>
+      <property name="bottomMargin">
+       <number>15</number>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="lineEditSearch">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>200</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QLineEdit {
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f8f9fa;   /* light neutral background */
+    color: #5a6c7d;             /* text color similar to buttons */
+}
+
+QLineEdit:focus {
+    border-color: #f5576c;       /* accent border on focus */
+    background-color: #ffffff;   /* slightly lighter when active */
+}
+
+QLineEdit:disabled {
+    background-color: #ededed;   /* washed-out grey */
+    color: #a1a8b3;             /* faded text */
+}
+</string>
+        </property>
+        <property name="placeholderText">
+         <string>🔍  Search by Course name or code...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="filterSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonRefresh">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: #f8f9fa;
+    color: #5a6c7d;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+
+QPushButton:hover {
+    border-color: #f5576c;
+    color: #f5576c;
+}
+
+QPushButton:pressed {
+    background-color: #e0e0e0; /* darker grey for pressed feedback */
+    border-color: #f5576c;
+    color: #f5576c;
+}</string>
+        </property>
+        <property name="text">
+         <string>🔄 Refresh</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="tableFrame">
+     <property name="styleSheet">
+      <string notr="true">background-color: white; border-radius: 12px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <layout class="QVBoxLayout" name="tableMainLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="tableHeader">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background: transparent; border-bottom: 2px solid #f0f0f0;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <layout class="QHBoxLayout" name="tableHeaderLayout">
+         <property name="leftMargin">
+          <number>25</number>
+         </property>
+         <property name="topMargin">
+          <number>15</number>
+         </property>
+         <property name="rightMargin">
+          <number>25</number>
+         </property>
+         <property name="bottomMargin">
+          <number>15</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="tableTitle">
+           <property name="styleSheet">
+            <string notr="true">font-size: 18px; font-weight: bold; color: #2c3e50; background: transparent;</string>
+           </property>
+           <property name="text">
+            <string>All Courses</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="tableHeaderSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonAddCourse">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">/* ---- Approve Button ---- */
+QPushButton {
+    background-color: #d4edda;
+    color: #155724;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+QPushButton:hover {
+    background-color: #28a745;
+    color: white;
+}
+QPushButton:pressed {
+    background-color: #1e7e34;  /* slightly darker for pressed feedback */
+}
+QPushButton:disabled {
+    background-color: #c1d9c3; /* more washed-out green */
+    color: #7a8b7a;
+}</string>
+           </property>
+           <property name="text">
+            <string>➕ Add New Course</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="buttonRemoveCourse">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">/* ---- Reject Button ---- */
+QPushButton {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+QPushButton:hover {
+    background-color: #c82333;
+    color: white;
+}
+QPushButton:pressed {
+    background-color: #a71d2a;  /* slightly darker for pressed feedback */
+}
+QPushButton:disabled {
+    background-color: #d7bcbc; /* more washed-out red */
+    color: #5e3b3e;
+}</string>
+           </property>
+           <property name="text">
+            <string>❌ Remove Course</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="tableAllCourses">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>300</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QTableWidget {
+    border: none;
+    background-color: white;
+    gridline-color: #e5e5e5;      /* slightly darker for visibility */
+    color: #222222;               /* matches QLineEdit text color */
+    font-size: 14px;
+}
+
+QTableWidget::item {
+    padding: 14px;
+    border: none;
+    color: #222222;               /* consistent text color */
+}
+
+QTableWidget::item:selected {
+    background-color: #fcebed;  /* soft pink selection */
+    color: #222222;             /* keep text readable */
+}
+
+QHeaderView::section {
+    background-color: #f8f9fa;
+    padding: 12px;
+	border: 1px solid #c1c1c1; 
+    font-size: 13px;
+    color: #555555;               /* similar to readOnly QLineEdit text */
+    font-weight: bold;
+}
+QTableWidget::item:focus {
+    outline: none;
+    border: none;
+}
+/* Removes weird selection rectangle */
+QTableWidget::item:focus {
+    outline: none;
+    border: none;
+}
+QTableWidget::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QTableWidget::indicator:unchecked {
+    border: 1px solid #b8b8b8;      /* soft grey border */
+    background-color: #f8f8f8;      /* very light grey */
+    border-radius: 3px;             /* slightly rounded */
+}
+
+QTableWidget::indicator:checked {
+    border: 1px solid #5a5a5a;      /* darker grey when selected */
+    background-color: #6c6c6c;      /* washed-out grey instead of harsh green */
+    image: url(&quot;&quot;);                 /* remove default checkmark */
+    border-radius: 3px;
+}
+
+QTableWidget::indicator:checked:hover,
+QTableWidget::indicator:unchecked:hover {
+    border-color: #3a3a3a;
+}
+
+QTableWidget::indicator:checked::after {
+    content: &quot;&quot;;
+    image: url(&quot;&quot;); /* no default checkmark */
+}
+/* ===== SCROLLBARS (VERTICAL &amp; HORIZONTAL) ===== */
+
+/* Track */
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: rgba(255, 255, 255, 0.05);  /* subtle track */
+    border-radius: 6px;
+    margin: 0px;  /* remove extra space */
+}
+
+/* Handle / Thumb */
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: rgba(120, 120, 120, 0.35);  /* glassy thumb */
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* subtle highlight */
+    min-height: 30px; /* vertical */
+    min-width: 30px;  /* horizontal */
+}
+
+QScrollBar::handle:vertical:hover,
+QScrollBar::handle:horizontal:hover {
+    background: rgba(120, 120, 120, 0.55);
+}
+
+/* Buttons (up/down or left/right) */
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 16px;  /* horizontal buttons width */
+    height: 16px; /* vertical buttons height */
+    background: rgba(180, 180, 180, 0.35);
+    border-radius: 4px;
+}
+
+/* Arrow icons */
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical,
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+    width: 6px;
+    height: 6px;
+    background: transparent;
+}
+
+/* Remove blank areas */
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* Sizes */
+QScrollBar:vertical { width: 12px; }
+QScrollBar:horizontal { height: 12px; }
+</string>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SelectionMode::ContiguousSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+        </property>
+        <property name="cornerButtonEnabled">
+         <bool>true</bool>
+        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>SELECT</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>#</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>COURSE CODE</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>COURSE NAME</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>CREDIT HOURS</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>SECTIONS</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>STUDENTS</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>ACTION</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Policy::Maximum</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>60</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CoursePrereqDialog</class>
+ <widget class="QDialog" name="CoursePrereqDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>493</width>
+    <height>712</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>700</width>
+    <height>1000</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Course Prerequisites</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #f5f7fa;</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="headerFrame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>80</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>80</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #f093fb, stop:1 #f5576c); border-radius: 0px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <layout class="QHBoxLayout" name="headerLayout">
+      <property name="leftMargin">
+       <number>30</number>
+      </property>
+      <property name="topMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>30</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="dialogTitle">
+        <property name="styleSheet">
+         <string notr="true">font-size: 24px; font-weight: bold; color: white; background: transparent;</string>
+        </property>
+        <property name="text">
+         <string>🔗  Course Prerequisites</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="headerSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="styleSheet">
+      <string notr="true">
+/* ===== SCROLLBARS (VERTICAL &amp; HORIZONTAL) ===== */
+
+/* Track */
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: rgba(255, 255, 255, 0.05);  /* subtle track */
+    border-radius: 6px;
+    margin: 0px;  /* remove extra space */
+}
+
+/* Handle / Thumb */
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: rgba(120, 120, 120, 0.35);  /* glassy thumb */
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* subtle highlight */
+    min-height: 30px; /* vertical */
+    min-width: 30px;  /* horizontal */
+}
+
+QScrollBar::handle:vertical:hover,
+QScrollBar::handle:horizontal:hover {
+    background: rgba(120, 120, 120, 0.55);
+}
+
+/* Buttons (up/down or left/right) */
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 16px;  /* horizontal buttons width */
+    height: 16px; /* vertical buttons height */
+    background: rgba(180, 180, 180, 0.35);
+    border-radius: 4px;
+}
+
+/* Arrow icons */
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical,
+QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+    width: 6px;
+    height: 6px;
+    background: transparent;
+}
+
+/* Remove blank areas */
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/* Sizes */
+QScrollBar:vertical { width: 12px; }
+QScrollBar:horizontal { height: 12px; }</string>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollContent">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>479</width>
+        <height>906</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #f5f7fa;</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="rightMargin">
+        <number>30</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelInfo">
+         <property name="styleSheet">
+          <string notr="true">font-size: 12px; color: #7f8c8d; background: transparent; padding: 10px;</string>
+         </property>
+         <property name="text">
+          <string>ℹ️ Select prerequisites from the lists. Students must complete all prerequisites before registering for this course.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>20</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayoutCourse">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="labelCourse">
+             <property name="styleSheet">
+              <string notr="true">font-size: 13px; color: #718096; font-weight: bold; background: transparent;</string>
+             </property>
+             <property name="text">
+              <string>Course*</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxSelectCourse">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>45</height>
+              </size>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* ----------------- QComboBox Base ----------------- */
+QComboBox {
+    border: 2px solid #E0E0E0;          /* main border */
+    border-radius: 10px;
+    padding: 8px 10px;                   /* Matches QLineEdit padding */
+    background: rgba(250, 250, 250, 200);
+    font-size: 11pt;
+    color: #111111;
+}
+
+/* Focused state */
+QComboBox:focus {
+    border: 2px solid #667EEA; 
+    background: rgba(250, 250, 250, 220);
+}
+
+/* ----------------- Drop-down Arrow ----------------- */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 30px; 
+    border-left-width: 1px;
+    border-left-color: #E0E0E0;
+    border-left-style: solid;
+    border-top-right-radius: 12px;       /* rounder corners */
+    border-bottom-right-radius: 12px;    /* rounder corners */
+    background: transparent;
+}
+
+/* Remove ugly black border on hover/focus */
+QComboBox::drop-down:hover,
+QComboBox::drop-down:focus {
+    border-left-color: #667EEA;
+    background: transparent;
+    border: none;
+}
+
+/* Modern, visible arrow using simple chevron */
+QComboBox::down-arrow {
+    width: 10px;
+    height: 10px;
+    border: solid #667EEA;
+    border-width: 0 2px 2px 0;
+    margin-right: 6px;
+}
+
+/* ----------------- Dropdown Popup ----------------- */
+/* Dropdown Popup */
+QComboBox QAbstractItemView {
+    background-color: #fdfdfd;          /* slightly off-white */
+    border: 2px solid #E0E0E0;          /* subtle grey border */
+    border-radius: 8px;                  /* may not be perfect on Windows */
+    color: #111111;
+    font-size: 11pt;
+    padding: 5px;
+    selection-background-color: #667EEA;
+    selection-color: white;
+    outline: none;
+}
+
+/* Items hover/selection */
+QComboBox QAbstractItemView::item:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+    color: #111111;
+}
+
+QComboBox QAbstractItemView::item:selected {
+    background-color: #667EEA;
+    color: white;
+}
+
+/* Error highlight for combo box */
+QComboBox[error=&quot;true&quot;] {
+    border: 2px solid #FF4A4A;
+}</string>
+             </property>
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>Select a course...</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="labelCurrentPrereq">
+           <property name="styleSheet">
+            <string notr="true">font-size: 13px; color: #718096; font-weight: bold; background: transparent;</string>
+           </property>
+           <property name="text">
+            <string>Current Prerequisites</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayoutDays">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+        </layout>
+       </item>
+       <item>
+        <widget class="QListWidget" name="listWidgetCurrentPrereq">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QListWidget {
+    background-color: #fafbfc;
+    border: 2px solid #e0e4ea;
+    border-radius: 10px;
+    padding: 6px;
+    font-size: 14px;
+    color: #3a4a5a;
+}
+
+QListWidget::item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 2px 4px;
+}
+
+QListWidget::item:hover {
+    background-color: #eef1f5;
+}
+
+QListWidget::item:selected {
+    background-color: #dbe7ff;      /* soft pastel selection */
+    color: #1f2d3d;
+}
+
+QListWidget::item:selected:active {
+    background-color: #c7dafc;
+}
+</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignmentFlag::AlignRight">
+        <widget class="QPushButton" name="buttonRemove">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>170</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">/* ---- Reject Button ---- */
+QPushButton {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+QPushButton:hover {
+    background-color: #c82333;
+    color: white;
+}
+QPushButton:pressed {
+    background-color: #a71d2a;  /* slightly darker for pressed feedback */
+}
+QPushButton:disabled {
+    background-color: #d7bcbc; /* more washed-out red */
+    color: #5e3b3e;
+}</string>
+         </property>
+         <property name="text">
+          <string>- Remove</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelPrereqToAdd">
+         <property name="styleSheet">
+          <string notr="true">font-size: 13px; color: #718096; font-weight: bold; background: transparent;</string>
+         </property>
+         <property name="text">
+          <string>Prerequisites to add</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="listWidgetAddPrereq">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QListWidget {
+    background-color: #fafbfc;
+    border: 2px solid #e0e4ea;
+    border-radius: 10px;
+    padding: 6px;
+    font-size: 14px;
+    color: #3a4a5a;
+}
+
+QListWidget::item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 2px 4px;
+}
+
+QListWidget::item:hover {
+    background-color: #eef1f5;
+}
+
+QListWidget::item:selected {
+    background-color: #dbe7ff;      /* soft pastel selection */
+    color: #1f2d3d;
+}
+
+QListWidget::item:selected:active {
+    background-color: #c7dafc;
+}
+</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignmentFlag::AlignRight">
+        <widget class="QPushButton" name="buttonAdd">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>170</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">/* ---- Approve Button ---- */
+QPushButton {
+    background-color: #d4edda;
+    color: #155724;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+QPushButton:hover {
+    background-color: #28a745;
+    color: white;
+}
+QPushButton:pressed {
+    background-color: #1e7e34;  /* slightly darker for pressed feedback */
+}
+QPushButton:disabled {
+    background-color: #c1d9c3; /* more washed-out green */
+    color: #7a8b7a;
+}</string>
+         </property>
+         <property name="text">
+          <string>+ Add</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Policy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>17</width>
+           <height>86</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="footerFrame">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>70</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: white; border-top: 2px solid #e0e0e0;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <layout class="QHBoxLayout" name="footerLayout">
+      <property name="leftMargin">
+       <number>30</number>
+      </property>
+      <property name="topMargin">
+       <number>15</number>
+      </property>
+      <property name="rightMargin">
+       <number>30</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <spacer name="footerSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonClose">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>45</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: #f8f9fa;
+    color: #5a6c7d;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+
+QPushButton:hover {
+    border-color: #f5576c;
+    color: #f5576c;
+}
+
+QPushButton:pressed {
+    background-color: #e0e0e0; /* darker grey for pressed feedback */
+    border-color: #f5576c;
+    color: #f5576c;
+}</string>
+        </property>
+        <property name="text">
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

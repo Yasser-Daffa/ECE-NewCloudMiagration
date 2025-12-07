@@ -1,0 +1,18 @@
+@echo off
+echo Building ECE Course Registration EXE...
+
+pyinstaller main.py ^
+    --name ECECourseRegistration ^
+    --noconsole ^
+    --onefile ^
+    --clean ^
+    --icon app.ico ^
+    --add-data "app_ui;app_ui" ^
+    --add-data "admin;admin" ^
+    --add-data "student;student" ^
+    --add-data "login_files;login_files" ^
+    --add-data "helper_files;helper_files" ^
+    --add-data "database_files;database_files"
+
+echo Build complete!
+pause
