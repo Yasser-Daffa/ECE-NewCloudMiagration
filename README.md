@@ -6,6 +6,8 @@ Originally developed using a **local SQLite database**, later fully migrated to 
 
 This system includes complete dashboards for **Students** and **Admins**, cloud-synced authentication, prerequisite checking, study plans, transcript generation, and real-time connection status monitoring.
 
+
+Honesty: This project wouldn't have been possible to make in such a short period of time (1.5 months) without the help of ChatGPT <3
 ---
 
 # Features Overview
@@ -201,6 +203,7 @@ Example:
     SUPABASE_USER = "postgres"
     SUPABASE_PASSWORD = "your_real_password"
     SUPABASE_DB = "postgres"
+```
     
 ---
 
