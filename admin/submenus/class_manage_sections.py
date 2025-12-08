@@ -17,8 +17,6 @@ from app_ui.admin_ui.submenus_ui.ui_manage_sections import Ui_ManageSections
 from admin.submenus.class_add_sections import AddSectionDialog
 from admin.submenus.class_edit_sections import EditSectionDialog  # NEW
 
-# Admin object
-from admin.class_admin_utilities import admin
 from helper_files.shared_utilities import BaseLoginForm
 
 
@@ -38,6 +36,8 @@ class ManageSectionsWidget(QWidget):
         self.ui.setupUi(self)
 
         self.admin_utils = admin_utils
+        self.db = admin_utils.db
+
         self.animate = BaseLoginForm.animate_label_with_dots
 
         # Cache of all sections loaded from DB
@@ -468,6 +468,16 @@ class ManageSectionsWidget(QWidget):
 # =============================== MAIN (Optional test run) ===============================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    w = ManageSectionsWidget(admin)
+
+
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    w = ManageSectionsWidget(admin_utils)
     w.show()
     sys.exit(app.exec())

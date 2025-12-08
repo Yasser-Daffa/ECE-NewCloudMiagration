@@ -7,24 +7,20 @@ from PyQt6.QtWidgets import QWidget, QTableWidgetItem, QMessageBox, QHeaderView
 from PyQt6.QtCore import Qt
 
 # Import the AdminUtilities instance (assuming it's named 'admin' in its file)
-from admin.class_admin_utilities import admin, db
 from admin.submenus.class_course_prereq_dialog import CoursePrereqDialogController
 
 from app_ui.admin_ui.submenus_ui.ui_manage_prereq import Ui_ManagePrereqs
-from app_ui.admin_ui.submenus_ui.ui_course_prereq_dialog import Ui_CoursePrereqDialog
-
-# Only needed for the standalone run block
-from database_files.class_database_uitlities import DatabaseUtilities
 from helper_files.shared_utilities import BaseLoginForm
 
 
 class ManagePrerequisitesController:
 
     # NOTE: We now take the AdminUtilities instance (admin) to access list_prerequisites
-    def __init__(self, ui, admin_instance, db: DatabaseUtilities):
+    def __init__(self, ui, admin_utils):
         self.ui = ui
-        self.admin = admin_instance  # Store the admin utility instance
-        self.db = db
+        self.admin_utils = admin_utils
+        self.db = admin_utils.db
+
         self.courses_data = []
         self.blf = BaseLoginForm() # Used for the animation utility
 
@@ -60,13 +56,13 @@ class ManagePrerequisitesController:
 
         # FIX: Use the admin instance (self.admin) to get the course list.
         # This instance is responsible for looking up the prerequisites for display.
-        rows = self.admin.list_courses() # This should return (code, name, credits)
+        rows = self.db.ListCourses() # This should return (code, name, credits)
 
         for i, row in enumerate(rows, start=1):
             course_code = str(row[0]).strip()
             
             # Fetch prerequisites using the admin utility for the current course
-            prereq_codes = self.admin.list_prerequisites(course_code)
+            prereq_codes = self.db.list_prerequisites(course_code)
             
             # Convert the list of codes into a readable string
             prereq_str = ", ".join(prereq_codes)
@@ -135,7 +131,7 @@ class ManagePrerequisitesController:
         dialog = QtWidgets.QDialog()
         
         # Instantiate the controller, passing the dialog instance
-        controller = CoursePrereqDialogController(dialog)
+        controller = CoursePrereqDialogController(dialog, self.admin_utils)
 
         # Show the dialog modally
         dialog.exec()
@@ -162,8 +158,15 @@ if __name__ == "__main__":
     ui = Ui_ManagePrereqs()
     ui.setupUi(window)
 
-    # Pass the imported 'admin' instance and the db instance to the controller
-    controller = ManagePrerequisitesController(ui, admin, db)
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from database_files.cloud_database import get_pooled_connection
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    controller = ManagePrerequisitesController(ui, admin_utils)
 
     window.show()
     sys.exit(app.exec())

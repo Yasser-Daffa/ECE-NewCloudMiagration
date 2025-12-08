@@ -14,15 +14,15 @@ from app_ui.admin_ui.submenus_ui.ui_add_courses_dialog import Ui_AddCourseDialog
 from admin.submenus.class_add_courses import AddCoursesDialog
 
 from helper_files.shared_utilities import BaseLoginForm
-from database_files.class_database_uitlities import DatabaseUtilities
-from admin.class_admin_utilities import db
+
 
 
 class ManageCoursesController:
 
-    def __init__(self, ui, db: DatabaseUtilities):
+    def __init__(self, ui, admin_utils):
         self.ui = ui
-        self.db = db
+        self.admin_utils = admin_utils
+        self.db = admin_utils.db   # <-- now DB is accessible
         self.courses_data = []
         self.blf = BaseLoginForm()
 
@@ -218,24 +218,33 @@ class ManageCoursesController:
         )
     # ------------------ ADD COURSE ------------------
     def handle_add_course_clicked(self):
-        from admin.class_admin_utilities import admin
         # Open our existing AddCoursesDialog
-        dialog = AddCoursesDialog(admin_utils=admin)  # pass your admin/db object
+        dialog = AddCoursesDialog(self.admin_utils)  # pass your admin/db object
         dialog.exec()
         self.load_courses()  # refresh table after a course is added
 
 
 
-# ---------------- MAIN APP ----------------
+# ---------------- Testings ----------------
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+    
+
+    from admin.class_admin_utilities import AdminUtilities
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from database_files.cloud_database import get_pooled_connection
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    admin_utils = AdminUtilities(db)
 
 
     window = QWidget()
     ui = Ui_ManageCourses()
-    ui.setupUi(window)
+    ui.setupUi(window)  
 
-    controller = ManageCoursesController(ui, db)
+    controller = ManageCoursesController(ui, admin_utils)
 
     window.show()
     sys.exit(app.exec())

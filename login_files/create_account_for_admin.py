@@ -32,7 +32,6 @@ from helper_files.validators import (
 # -----------------------------
 # Database connection
 # -----------------------------
-from admin.class_admin_utilities import db
 
 
 class SignupAndConfirmWindow(BaseLoginForm):
@@ -48,11 +47,12 @@ class SignupAndConfirmWindow(BaseLoginForm):
     Only creates ADMIN accounts.
     """
 
-    def __init__(self, parent: QWidget | None = None):
+    def __init__(self, admin_utils, parent: QWidget | None = None):
         super().__init__(parent)
 
         # Persistent resources
-        self.db = db
+        self.admin_utils = admin_utils
+        self.db = admin_utils.db
         self.email_sender = EmailSender()
 
         # Temporary storage for account creation
@@ -311,6 +311,15 @@ class SignupAndConfirmWindow(BaseLoginForm):
 # -------------------------------------------------------------
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = SignupAndConfirmWindow()
+
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    window = SignupAndConfirmWindow(admin_utils)
     window.show()
     sys.exit(app.exec())

@@ -27,6 +27,8 @@ class EditSectionDialog(QDialog, BaseLoginForm):
         self.ui.setupUi(self)
 
         self.admin_utils = admin_utils
+        self.db = admin_utils.db
+        
         self.section_data = section_data
         self.section_id = section_data["section_id"]
 

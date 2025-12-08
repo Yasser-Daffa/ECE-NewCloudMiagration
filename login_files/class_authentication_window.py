@@ -37,12 +37,9 @@ from helper_files.validators import (
 # Database utilities
 # -----------------------------
 
-from admin.class_admin_utilities import db
-
-
 
 class AuthenticationWindow(BaseLoginForm, EmailSender): 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
 
         # Call it to create/connect the database and return the connection and cursor
@@ -220,14 +217,12 @@ class AuthenticationWindow(BaseLoginForm, EmailSender):
         # --- 8. Redirect to the correct dashboard ---
         if state == "student":
             from student.class_student_dashboard import StudentDashboard
-            from student.class_student_utilities import db 
-            self.student_dash = StudentDashboard(db, user)
+            self.student_dash = StudentDashboard(self.db, user)
             self.student_dash.show()
 
         elif state == "admin":
             from admin.class_admin_dashboard import AdminDashboard
-            from admin.class_admin_utilities import db
-            self.admin_dash = AdminDashboard(db, user)
+            self.admin_dash = AdminDashboard(self.db, user)
             self.admin_dash.show()
 
 
@@ -556,6 +551,13 @@ class AuthenticationWindow(BaseLoginForm, EmailSender):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = AuthenticationWindow() 
+
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    window = AuthenticationWindow(db) 
     window.show()
     sys.exit(app.exec())

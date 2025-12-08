@@ -1,12 +1,13 @@
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 
-from PyQt6.QtCore import QPropertyAnimation, QEasingCurve, QTimer
+from PyQt6.QtCore import QTimer
 
 from PyQt6 import QtWidgets
-from student.class_student_utilities import StudentUtilities, db
-from admin.class_admin_utilities import AdminUtilities
 from database_files.cloud_database import is_connected_to_db
+
+from student.class_student_utilities import StudentUtilities
+from admin.class_admin_utilities import AdminUtilities
 
 # Subpage UI & Controller imports
 from app_ui.student_ui.ui_student_dashboard import Ui_StudentDashboard
@@ -23,9 +24,8 @@ from student.submenus.class_view_prereqs import ViewPrereqsWidget
 
 from student.submenus.class_view_program_plans import ViewProgramPlansWidget
 
-
-from app_ui.student_ui.submenus_ui.ui_transcript import Ui_Transcript
 from student.submenus.class_transcript import TranscriptWidget
+
 
 
 # CANT TEST THIS CLASS IN HERE UNLESS WE HAVE THE REQUIRED INFORMATION FROM USERS
@@ -44,10 +44,22 @@ class StudentDashboard(QtWidgets.QMainWindow):
         # -------------------------------
         self.ui = Ui_StudentDashboard()
         self.ui.setupUi(self)
+
         self.db = db
         self.user_info = user_info
-        self.user_id, self.name, self.email, self.program, self.state, self.account_status, self.hashed_pw = user_info
+        (
+            self.user_id,
+            self.name,
+            self.email,
+            self.program,
+            self.state,
+            self.account_status,
+            self.hashed_pw,
+        ) = user_info
+
+        # Shared utilities
         self.student = StudentUtilities(self.db, self.user_id)
+        self.admin_utils = AdminUtilities(self.db)
 
         # Displays the name at the top-left side near the pfp
         self.ui.labelStudentName.setText(self.name)
@@ -124,13 +136,13 @@ class StudentDashboard(QtWidgets.QMainWindow):
         # # -------------------------------
         # # Profile page
         # # -------------------------------
-        self.profile_page = ProfileWidget(self.user_info)
+        self.profile_page = ProfileWidget(self.student, self.user_info)
 
         # -------------------------------
         # Current Sched page
         # -------------------------------
         # this page sets up its own ui internally.
-        self.current_schedule_page = CurrentScheduleWidget(self.user_id)
+        self.current_schedule_page = CurrentScheduleWidget(self.student, self.admin_utils)
 
         # # already added inside innit
         
@@ -139,25 +151,24 @@ class StudentDashboard(QtWidgets.QMainWindow):
         # Register Courses page
         # -------------------------------
         # this page sets up its own ui internally.
-        self.register_courses_page = RegisterCoursesWidget(self.user_id, semester=None)
+        self.register_courses_page = RegisterCoursesWidget(self.student, self.admin_utils, semester=None)
         
         # -------------------------------
         # View Prerequisites page
         # -------------------------------
-        self.view_prereqs_page = ViewPrereqsWidget(db)
+        self.view_prereqs_page = ViewPrereqsWidget(self.student, self.admin_utils)
 
         # -------------------------------
         # View Program courses
         # -------------------------------
         # this page sets up its own ui internally.
-        self.view_program_plans_page = ViewProgramPlansWidget(db)
+        self.view_program_plans_page = ViewProgramPlansWidget(self.student, self.admin_utils)
 
         # # -------------------------------
         # # Transcript courses
         # # -------------------------------
         # this page sets up its own ui internally.
-        self.transcript_page = TranscriptWidget(self.user_id)
-        
+        self.transcript_page = TranscriptWidget(self.student, self.admin_utils)        
 
 
     # -------------------------------
@@ -201,7 +212,7 @@ class StudentDashboard(QtWidgets.QMainWindow):
 
     def show_authentication_window(self):
         from login_files.class_authentication_window import AuthenticationWindow
-        self.authentication_window = AuthenticationWindow()
+        self.authentication_window = AuthenticationWindow(self.db)
         self.authentication_window.show()
 
 
@@ -216,18 +227,27 @@ class StudentDashboard(QtWidgets.QMainWindow):
 
 
 # ------------------------------- MAIN APP -------------------------------
+# ------------------------------- MAIN APP (TEST ONLY) -------------------------------
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+
+    # Create pooled DB connection for testing
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
     fake_user_info = (
-        2500001,             # user_id
+        2599999,             # user_id ()
         "Test Student",      # name
         "test@example.com",  # email
         "COMP",              # program
-        "student",            # state
+        "student",           # state
         "active",            # account_status
-        "fake_hash"          # hashed password (unused by dashboard)
+        "fake_hash",         # hashed password (unused by dashboard)
     )
+
     window = StudentDashboard(db, fake_user_info)
     window.show()
     sys.exit(app.exec())

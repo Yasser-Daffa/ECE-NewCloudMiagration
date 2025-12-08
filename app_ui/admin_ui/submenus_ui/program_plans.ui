@@ -522,7 +522,7 @@ QPushButton:pressed {
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="buttonViewSections">
+          <widget class="QPushButton" name="buttonEdit">
            <property name="enabled">
             <bool>true</bool>
            </property>

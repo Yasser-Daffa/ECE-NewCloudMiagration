@@ -12,7 +12,7 @@ from PyQt6.QtCore import Qt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from app_ui.student_ui.submenus_ui.ui_view_program_plans import Ui_ViewProgramPlans
-from helper_files.shared_utilities import BaseLoginForm, warning, info, error
+from helper_files.shared_utilities import BaseLoginForm
 from admin.class_admin_utilities import AdminUtilities
 
 
@@ -22,15 +22,17 @@ class ViewProgramPlansWidget(QWidget):
     Uses AdminUtilities → list_plan_courses() to load all data.
     """
 
-    def __init__(self, db, parent=None):
+    def __init__(self, student_utils, admin_utils, parent=None):
         super().__init__(parent)
 
         self.ui = Ui_ViewProgramPlans()
         self.ui.setupUi(self)
         self.blf = BaseLoginForm()
 
-        # Create admin_utils using SAME db
-        self.admin_utils = AdminUtilities(db)
+        self.student_utils = student_utils
+        self.admin_utils = admin_utils
+        self.db = student_utils.db
+
         self.all_rows = []  # will hold (program, code, name, credits, level)
 
         self.setup_programs_combo()
@@ -171,6 +173,20 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     from admin.class_admin_utilities import db
 
-    w = ViewProgramPlansWidget(db)
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from student.class_student_utilities import StudentUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    student_utils = StudentUtilities(db, 2500001)
+    admin_utils = AdminUtilities(db)
+
+    w = ViewProgramPlansWidget(student_utils, admin_utils)
     w.show()
+
     sys.exit(app.exec())
+
+

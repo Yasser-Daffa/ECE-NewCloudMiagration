@@ -2,9 +2,9 @@
 
 import os
 import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore import Qt
 
 # Student Profile UI
 from app_ui.student_ui.submenus_ui.ui_profile import Ui_Profile
@@ -13,8 +13,6 @@ from app_ui.student_ui.submenus_ui.ui_profile import Ui_Profile
 from helper_files.shared_utilities import info, warning, error
 from helper_files.validators import validate_email
 
-# Student database object
-from student.class_student_utilities import db
 
 
 class ProfileWidget(QWidget):
@@ -27,9 +25,9 @@ class ProfileWidget(QWidget):
     - Updates the email inside the database using update_user()
     """
 
-    def __init__(self, student_user_data, parent=None):
+    def __init__(self, student_utils, student_user_data, parent=None):
         """
-        student_user_data → (user_id, name, email, program, state, account_status)
+        student_user_data -> (user_id, name, email, program, state, account_status)
         """
         super().__init__(parent)
 
@@ -37,8 +35,10 @@ class ProfileWidget(QWidget):
         self.ui = Ui_Profile()
         self.ui.setupUi(self)
 
+        self.student_utils = student_utils
+        self.db = student_utils.db
+
         # ----------------- Store DB and user info -----------------
-        self.db = db
         self.student_id = student_user_data[0]
         self.name = student_user_data[1] or ""
         self.email = student_user_data[2] or ""

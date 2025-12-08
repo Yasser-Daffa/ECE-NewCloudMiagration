@@ -15,9 +15,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 # UI from Qt Designer
 from app_ui.student_ui.submenus_ui.ui_view_sections import Ui_ViewSections
 
-# Student logic + database
-from student.class_student_utilities import StudentUtilities, db
-
 # Replacing QMessageBox with info, warning, error
 from helper_files.shared_utilities import info, warning, error
 
@@ -28,15 +25,18 @@ class ViewSectionsWidget(QWidget):
     This version removes checkboxes and uses Qt row selection instead.
     """
 
-    def __init__(self, student_id: int, semester: str, course_codes, parent=None):
+    def __init__(self, student_utils, admin_utils, semester: str, course_codes, parent=None):
         super().__init__(parent)
 
-        # Setup UI
         self.ui = Ui_ViewSections()
         self.ui.setupUi(self)
 
-        self.student_utils = StudentUtilities(db, student_id)
-        self.student_id = student_id
+        self.student_utils = student_utils
+        self.admin_utils = admin_utils
+        self.db = student_utils.db  # shared pooled DB
+
+        self.student_id = student_utils.student_id
+        
         self.semester = semester
         self.course_codes = list(course_codes)
 
@@ -313,7 +313,18 @@ class ViewSectionsWidget(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    w = ViewSectionsWidget(2500001, "First", ["MATH204"])
-    w.show()
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from student.class_student_utilities import StudentUtilities
+    from admin.class_admin_utilities import AdminUtilities
 
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    student_utils = StudentUtilities(db, 2500001)
+    admin_utils = AdminUtilities(db)
+
+    w = ViewSectionsWidget(student_utils, admin_utils, "First", ["EE202"])
+    w.show()
     sys.exit(app.exec())
+

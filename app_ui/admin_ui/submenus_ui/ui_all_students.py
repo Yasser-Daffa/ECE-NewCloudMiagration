@@ -385,7 +385,7 @@ class Ui_AllStudents(object):
 "")
         self.tableAllStudents.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableAllStudents.setAlternatingRowColors(True)
-        self.tableAllStudents.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tableAllStudents.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.tableAllStudents.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.tableAllStudents.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.tableAllStudents.setHorizontalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
@@ -447,3 +447,13 @@ class Ui_AllStudents(object):
         item.setText(_translate("AllStudents", "STATE"))
         item = self.tableAllStudents.horizontalHeaderItem(6)
         item.setText(_translate("AllStudents", "ACTION"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    AllStudents = QtWidgets.QWidget()
+    ui = Ui_AllStudents()
+    ui.setupUi(AllStudents)
+    AllStudents.show()
+    sys.exit(app.exec())

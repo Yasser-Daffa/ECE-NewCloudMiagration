@@ -10,7 +10,6 @@ from PyQt6.QtCore import Qt
 from app_ui.admin_ui.submenus_ui.ui_add_grades import Ui_AddGradesDialog
 from helper_files.shared_utilities import warning, info, error
 from admin.class_admin_utilities import AdminUtilities
-from database_files.class_database_uitlities import DatabaseUtilities
 
 
 class AddGradesDialog(QDialog):
@@ -22,14 +21,14 @@ class AddGradesDialog(QDialog):
     - Semester year is provided by admin; semester name comes from registration data.
     """
 
-    def __init__(self, admin_utils: AdminUtilities, db: DatabaseUtilities, parent=None):
+    def __init__(self, admin_utils: AdminUtilities, parent=None):
         super().__init__(parent)
 
         self.ui = Ui_AddGradesDialog()
         self.ui.setupUi(self)
 
         self.admin_utils = admin_utils
-        self.db = db
+        self.db = admin_utils.db
 
         self.setWindowTitle("Add Grades")
         self.setModal(True)
@@ -197,10 +196,16 @@ class AddGradesDialog(QDialog):
 # Standalone Test
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
 
-    from admin.class_admin_utilities import admin as admin_utils, db
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
 
-    dlg = AddGradesDialog(admin_utils, db)
+    dlg = AddGradesDialog(admin_utils)
     dlg.show()
 
     sys.exit(app.exec())

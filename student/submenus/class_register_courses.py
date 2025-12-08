@@ -8,8 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from app_ui.student_ui.submenus_ui.ui_register_courses import Ui_RegisterCourses
 from student.submenus.class_view_sections import ViewSectionsWidget
 from helper_files.shared_utilities import show_msg
-from admin.class_admin_utilities import admin as admin_utils
-from student.class_student_utilities import StudentUtilities, db
+
 
 
 class RegisterCoursesWidget(QWidget):
@@ -21,16 +20,19 @@ class RegisterCoursesWidget(QWidget):
     - Opens a modal dialog showing sections for ALL selected courses
     """
 
-    def __init__(self, student_id: int, semester: str, parent=None):
+    def __init__(self, student_utils, admin_utils, semester, parent=None):
         super().__init__(parent)
 
         # Load UI
         self.ui = Ui_RegisterCourses()
         self.ui.setupUi(self)
+
+        self.student_utils = student_utils
         self.admin_utils = admin_utils
+        self.db = student_utils.db     # same DB object
+        self.semester = semester
 
         # Utilities
-        self.student_utils = StudentUtilities(db, student_id)
         self.semester = semester
         self.sections_windows = []    # old design, not used but kept for compatibility
         self.all_courses = []         # full list of available courses
@@ -315,6 +317,19 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     student_id = 2500001
     semester = "First"
-    window = RegisterCoursesWidget(student_id, semester)
+    
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from student.class_student_utilities import StudentUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    student_utils = StudentUtilities(db, student_id)
+    admin_utils = AdminUtilities(db)
+
+    window = RegisterCoursesWidget(student_utils, admin_utils, semester)
+
     window.show()
     sys.exit(app.exec())

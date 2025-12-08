@@ -16,8 +16,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from app_ui.student_ui.submenus_ui.ui_transcript import Ui_Transcript
 
 # Student utilities + database reference
-from student.class_student_utilities import StudentUtilities, db
-
 
 class TranscriptWidget(QWidget):
     """
@@ -32,15 +30,16 @@ class TranscriptWidget(QWidget):
       using simple logic.
     """
 
-    def __init__(self, student_id: int, parent=None):
+    def __init__(self, student_utils, admin_utils=None, parent=None):
         super().__init__(parent)
 
-        # Load UI
         self.ui = Ui_Transcript()
         self.ui.setupUi(self)
 
-        self.student_id = student_id
-        self.student_utils = StudentUtilities(db, student_id)
+        self.student_utils = student_utils
+        self.admin_utils = admin_utils
+        self.db = student_utils.db
+        self.student_id = student_utils.student_id
 
         # This widget only displays transcript history.
 
@@ -229,10 +228,22 @@ class TranscriptWidget(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # Change this ID to a real student existing in your database
-    test_student_id = 2500001
+    # Change this ID to a real student existing in database
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from student.class_student_utilities import StudentUtilities
+    from admin.class_admin_utilities import AdminUtilities
 
-    w = TranscriptWidget(test_student_id)
+    # Create pooled DB
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    # Create utilities
+    student_utils = StudentUtilities(db, 2500001)
+    admin_utils = AdminUtilities(db)
+
+    w = TranscriptWidget(student_utils, admin_utils)
     w.show()
+
 
     sys.exit(app.exec())

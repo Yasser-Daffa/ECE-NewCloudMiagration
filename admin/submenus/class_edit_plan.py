@@ -10,8 +10,7 @@ from PyQt6.QtWidgets import (
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from app_ui.admin_ui.submenus_ui.ui_edit_course_to_plan_dialog import Ui_AddCourseDialog
-from admin.class_admin_utilities import admin
-from helper_files.shared_utilities import warning, info, error
+from helper_files.shared_utilities import info, error
 
 
 class EditCourseToPlanDialog(QDialog):
@@ -30,6 +29,7 @@ class EditCourseToPlanDialog(QDialog):
         self.ui.setupUi(self)
 
         self.admin_utils = admin_utils
+        self.db = admin_utils.db
 
         # Store old values (strip whitespace & normalize case)
         self.old_program = (old_program or "").strip().upper()
@@ -191,8 +191,15 @@ class EditCourseToPlanDialog(QDialog):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # Simple test example
-    dlg = EditCourseToPlanDialog(admin, "COMP", "CPE101", 1)
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+    
+    dlg = EditCourseToPlanDialog(admin_utils, "COMP", "CPE101", 1)
     dlg.show()
 
     sys.exit(app.exec())

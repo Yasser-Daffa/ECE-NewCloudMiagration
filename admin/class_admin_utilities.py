@@ -222,9 +222,12 @@ class AdminUtilities:
 
     def admin_show_plans(self):
         """
-        يعرض كل الخطط وكل المواد داخل كل خطة.
+        يعرض كل الخطط الدراسية لكل برنامج،
+        ويعرض المواد الموجودة داخل كل خطة مرتبة حسب المستوى.
         """
-        rows = self.db.list_plan_courses()  # نعرض كل الخطط
+
+        rows = self.db.list_plan_courses()
+        # (program, course_code, course_name, credits, level)
 
         if not rows:
             print("No plans found.")
@@ -232,30 +235,19 @@ class AdminUtilities:
 
         current_program = None
 
-        # كل صف يحتوي:
-        # (program, course_code, course_name, credits, level)
-        for program, code, name, credits, level in rows:
+        print("\n====== Study Plans ======\n")
 
-            # إذا تغيّر التخصص نبدأ عنوان جديد
+        for program, code, name, level in rows:
+
+            # إذا دخلنا برنامج جديد نطبع عنوان جديد
             if program != current_program:
                 current_program = program
-                print(f"\n===== Plan: {program} =====")
+                print(f"\n====== Program: {program} ======")
 
-            # نعرض المادة والمستوى
-            print(f"Level {level}: {code} - {name} ({credits} credits)")
+            # عرض المادة
+            print(f"  Level {level}: {code} - {name} ")   
 
 
-
-    # إدارة التسجيل
-    def manage_registration_period(self):
-        print("1. Open Registration")
-        print("2. Close Registration")
-        ch = input("Choose: ")
-        sem = input("Enter Semester: ")
-        if ch == '1':
-            self.reg_manager.open_registration(sem)
-        elif ch == '2':
-            self.reg_manager.close_registration(sem)
 
     def admin_update_course_to_plan(self,
                                     old_program,
@@ -336,35 +328,8 @@ class AdminUtilities:
         حذف جميع الطلاب/المستخدمين من جدول users.
         """
         self.db.delete_all_users()
-        return "All students removed."
-    
-    def admin_show_plans(self):
-        """
-        يعرض كل الخطط الدراسية لكل برنامج،
-        ويعرض المواد الموجودة داخل كل خطة مرتبة حسب المستوى.
-        """
+        return "All students removed." 
 
-        rows = self.db.list_plan_courses()
-        # يرجّع صفوف بالشكل:
-        # (program, course_code, course_name, credits, level)
-
-        if not rows:
-            print("No plans found.")
-            return
-
-        current_program = None
-
-        print("\n====== Study Plans ======\n")
-
-        for program, code, name, level in rows:
-
-            # إذا دخلنا برنامج جديد نطبع عنوان جديد
-            if program != current_program:
-                current_program = program
-                print(f"\n====== Program: {program} ======")
-
-            # عرض المادة
-            print(f"  Level {level}: {code} - {name} ")    
 
         # ---------------- ADMIN MANAGEMENT ----------------
     def delete_admin(self, user_id: int):
@@ -386,34 +351,6 @@ class AdminUtilities:
         )
 
 
-admin = AdminUtilities(db)
-def admin_show_plans(self):
-    """
-    يعرض كل الخطط الدراسية لكل برنامج،
-    ويعرض المواد الموجودة داخل كل خطة مرتبة حسب المستوى.
-    """
-
-    rows = self.db.list_plan_courses()
-    # يرجّع صفوف بالشكل:
-    # (program, course_code, course_name, credits, level)
-
-    if not rows:
-        print("No plans found.")
-        return
-
-    current_program = None
-
-    print("\n====== Study Plans ======\n")
-
-    for program, code, name, level in rows:
-
-        # إذا دخلنا برنامج جديد نطبع عنوان جديد
-        if program != current_program:
-            current_program = program
-            print(f"\n====== Program: {program} ======")
-
-        # عرض المادة
-        print(f"  Level {level}: {code} - {name} ")
 
 
 

@@ -4,15 +4,17 @@ from PyQt6 import QtWidgets
 # Setup path to reach project root
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from admin.class_admin_utilities import admin
 from app_ui.admin_ui.submenus_ui.ui_course_prereq_dialog import Ui_CoursePrereqDialog
 from helper_files.shared_utilities import warning, error, info
 
 
 class CoursePrereqDialogController:
 
-    def __init__(self, dialog: QtWidgets.QDialog, ui=None):
+    def __init__(self, dialog: QtWidgets.QDialog, admin_utils):
         self.dialog = dialog
+        self.admin_utils = admin_utils
+        self.db = admin_utils.db
+
         self.ui = Ui_CoursePrereqDialog()
         self.ui.setupUi(dialog)
 
@@ -31,7 +33,7 @@ class CoursePrereqDialogController:
         self.ui.comboBoxSelectCourse.addItem("Select a course...", None)
         
         # admin.list_courses() returns tuples (code, name, credits)
-        courses = admin.list_courses() or []
+        courses = self.admin_utils.list_courses() or []
         for code, name, *_ in courses:
             clean_code = str(code).strip()
             self.ui.comboBoxSelectCourse.addItem(f"{clean_code} - {name}", clean_code)
@@ -77,15 +79,15 @@ class CoursePrereqDialogController:
         self.ui.listWidgetAddPrereq.clear()
         
         if not self.selected_course:
-            return
+            return 
 
         try:
             # 1. Create a Lookup Map for Course Names { 'MATH101': 'Calculus I' }
-            all_courses = admin.list_courses() or []
+            all_courses = self.admin_utils.list_courses() or []
             course_map = {str(c[0]).strip(): str(c[1]).strip() for c in all_courses}
 
             # 2. Get prerequisites (Now returns full codes like 'MATH101' due to Fix #1)
-            prereq_codes = [str(p).strip() for p in admin.list_prerequisites(self.selected_course)]
+            prereq_codes = [str(p).strip() for p in self.admin_utils.list_prerequisites(self.selected_course)]
             
             # 3. Populate "Current Prerequisites" with Name lookup
             current_display_items = []
@@ -126,7 +128,7 @@ class CoursePrereqDialogController:
             code = full_text.split(" - ")[0].strip()
             
             # Add to DB
-            admin.add_prerequisites(self.selected_course, [code])
+            self.admin_utils.add_prerequisites(self.selected_course, [code])
         
         self.refresh_prereqs()
 
@@ -147,7 +149,7 @@ class CoursePrereqDialogController:
             code_to_remove = full_text.split(" - ")[0].strip()
             
             # Remove from DB
-            admin.delete_prerequisite(self.selected_course, code_to_remove)
+            self.admin_utils.delete_prerequisite(self.selected_course, code_to_remove)
 
         self.refresh_prereqs()
         
@@ -156,6 +158,15 @@ class CoursePrereqDialogController:
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     dialog = QtWidgets.QDialog()
-    controller = CoursePrereqDialogController(dialog)
+
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    controller = CoursePrereqDialogController(dialog, admin_utils)
     dialog.show()
     sys.exit(app.exec())

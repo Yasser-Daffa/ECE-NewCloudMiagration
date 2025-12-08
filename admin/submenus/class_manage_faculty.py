@@ -15,7 +15,6 @@ from PyQt6.QtCore import Qt
 
 from app_ui.admin_ui.submenus_ui.ui_manage_faculty import Ui_ManageFaculty
 from helper_files.shared_utilities import BaseLoginForm, warning, info
-from database_files.class_database_uitlities import DatabaseUtilities
 from login_files.create_account_for_admin import SignupAndConfirmWindow
 
 
@@ -29,13 +28,15 @@ class ManageFacultyWidget(QWidget):
     - No actions column inside the table
     """
 
-    def __init__(self, db: DatabaseUtilities, parent=None):
+    def __init__(self, admin_utils, parent=None):
         super().__init__(parent)
 
         self.ui = Ui_ManageFaculty()
         self.ui.setupUi(self)
+        # Setup admin utils connection with db
+        self.admin_utils = admin_utils
+        self.db = admin_utils.db
 
-        self.db = db
         self.blf = BaseLoginForm()
         self.admins_data = []
 
@@ -233,7 +234,16 @@ class ManageFacultyWidget(QWidget):
 # Standalone test
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    from admin.class_admin_utilities import db as admin_db
-    window = ManageFacultyWidget(admin_db)
+
+    
+    from admin.class_admin_utilities import AdminUtilities
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from database_files.cloud_database import get_pooled_connection
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    window = ManageFacultyWidget(admin_utils)
     window.show()
     sys.exit(app.exec())

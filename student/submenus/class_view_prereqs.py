@@ -19,16 +19,17 @@ class ViewPrereqsWidget(QWidget):
         Prerequisites (comma separated)
     """
 
-    def __init__(self, db, parent=None):
+    def __init__(self, student_utils, admin_utils, parent=None):
         super().__init__(parent)
 
         self.ui = Ui_ViewPrereqs()
         self.ui.setupUi(self)
 
-        self.db = db
-        self.admin_utils = AdminUtilities(db)
-        self.blf = BaseLoginForm()
+        self.student_utils = student_utils
+        self.admin_utils = admin_utils
+        self.db = student_utils.db
 
+        self.blf = BaseLoginForm()
         self.courses_data = []
 
         # signals
@@ -145,8 +146,21 @@ class ViewPrereqsWidget(QWidget):
 
 # Standalone test
 if __name__ == "__main__":
-    from admin.class_admin_utilities import db
     app = QtWidgets.QApplication(sys.argv)
-    w = ViewPrereqsWidget(db)
+    
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from student.class_student_utilities import StudentUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    student_utils = StudentUtilities(db, 2500001)
+    admin_utils = AdminUtilities(db)
+
+    w = ViewPrereqsWidget(student_utils, admin_utils)
+
+
     w.show()
     sys.exit(app.exec())

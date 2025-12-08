@@ -289,11 +289,11 @@ class Ui_ProgramPlans(object):
         self.tableHeaderLayout.addWidget(self.tableTitle)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.tableHeaderLayout.addItem(spacerItem2)
-        self.buttonViewSections = QtWidgets.QPushButton(parent=self.tableHeader)
-        self.buttonViewSections.setEnabled(True)
-        self.buttonViewSections.setMinimumSize(QtCore.QSize(120, 40))
-        self.buttonViewSections.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        self.buttonViewSections.setStyleSheet("QPushButton {\n"
+        self.buttonEdit = QtWidgets.QPushButton(parent=self.tableHeader)
+        self.buttonEdit.setEnabled(True)
+        self.buttonEdit.setMinimumSize(QtCore.QSize(120, 40))
+        self.buttonEdit.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
+        self.buttonEdit.setStyleSheet("QPushButton {\n"
 "    background-color: #f5576c;\n"
 "    color: #ffffff;\n"
 "    border: none;\n"
@@ -313,8 +313,8 @@ class Ui_ProgramPlans(object):
 "    background-color: #cccccc;  /* gray background for disabled */\n"
 "    color: #666666;             /* darker gray text */\n"
 "}")
-        self.buttonViewSections.setObjectName("buttonViewSections")
-        self.tableHeaderLayout.addWidget(self.buttonViewSections)
+        self.buttonEdit.setObjectName("buttonEdit")
+        self.tableHeaderLayout.addWidget(self.buttonEdit)
         self.buttonAddCourse = QtWidgets.QPushButton(parent=self.tableHeader)
         self.buttonAddCourse.setEnabled(True)
         self.buttonAddCourse.setMinimumSize(QtCore.QSize(120, 40))
@@ -536,7 +536,7 @@ class Ui_ProgramPlans(object):
         self.comboBoxStatusFilter.setItemText(7, _translate("ProgramPlans", "Level 7"))
         self.buttonRefresh.setText(_translate("ProgramPlans", "🔄 Refresh"))
         self.tableTitle.setText(_translate("ProgramPlans", "📚 Available Corurses"))
-        self.buttonViewSections.setText(_translate("ProgramPlans", "Edit Plan"))
+        self.buttonEdit.setText(_translate("ProgramPlans", "Edit Plan"))
         self.buttonAddCourse.setText(_translate("ProgramPlans", "➕ Add Course to plan"))
         self.buttonRemoveCourse.setText(_translate("ProgramPlans", "❌ Remove Course from plan"))
         item = self.tableAllCourses.horizontalHeaderItem(0)
@@ -551,3 +551,13 @@ class Ui_ProgramPlans(object):
         item.setText(_translate("ProgramPlans", "CREDIT HOURS"))
         item = self.tableAllCourses.horizontalHeaderItem(5)
         item.setText(_translate("ProgramPlans", "PREREQUISITES"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    ProgramPlans = QtWidgets.QWidget()
+    ui = Ui_ProgramPlans()
+    ui.setupUi(ProgramPlans)
+    ProgramPlans.show()
+    sys.exit(app.exec())

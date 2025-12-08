@@ -14,7 +14,6 @@ from PyQt6.QtCore import Qt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from app_ui.admin_ui.submenus_ui.ui_program_plans import Ui_ProgramPlans
-from admin.class_admin_utilities import admin
 from helper_files.shared_utilities import BaseLoginForm, warning, info, error
 
 
@@ -33,8 +32,10 @@ class ProgramPlansWidget(QWidget):
         self.ui = Ui_ProgramPlans()
         self.ui.setupUi(self)
         self.blf = BaseLoginForm()
-
+    
         self.admin_utils = admin_utils
+        self.db = admin_utils.db
+
         self.all_rows = []  # Each row is (program, code, name, credits, level)
 
         # Setup program and level combo boxes
@@ -46,6 +47,7 @@ class ProgramPlansWidget(QWidget):
         self.ui.buttonAddCourse.clicked.connect(self.on_add_course_clicked)
         self.ui.comboBoxSelectProgram.currentIndexChanged.connect(self.load_plans)
         self.ui.comboBoxStatusFilter.currentIndexChanged.connect(self.load_plans)
+        self.ui.buttonEdit.clicked.connect
 
         table = self.ui.tableAllCourses
         table.setSelectionBehavior(table.SelectionBehavior.SelectRows)
@@ -260,13 +262,42 @@ class ProgramPlansWidget(QWidget):
         dialog = AddCourseToPlanDialog(self.admin_utils)
         dialog.exec()
 
-    # Placeholders for future use
+
     def on_edit_plan_clicked(self):
-        pass
+        table = self.ui.tableAllCourses
+        selected = table.selectedIndexes()
+
+        if not selected:
+            warning(self, "Please select a course to edit.")
+            return
+
+        row = selected[0].row()
+
+        program = table.item(row, 2).data(Qt.ItemDataRole.UserRole)
+        course_code = table.item(row, 2).text().strip()
+        level = int(table.item(row, 1).text())
+
+        if level > 9:
+            warning(None, "level cannot be more than 9")
+            return
+
+        from admin.submenus.class_edit_plan import EditCourseToPlanDialog
+        dialog = EditCourseToPlanDialog(self.admin_utils, program, course_code, level)
+        dialog.exec()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    w = ProgramPlansWidget(admin)
+
+
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from database_files.cloud_database import get_pooled_connection
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    w = ProgramPlansWidget(admin_utils)
     w.show()
     sys.exit(app.exec())

@@ -9,8 +9,7 @@ from PyQt6.QtCore import Qt
 
 from app_ui.admin_ui.submenus_ui.ui_all_students import Ui_AllStudents
 from helper_files.shared_utilities import BaseLoginForm
-from database_files.class_database_uitlities import DatabaseUtilities
-from admin.class_admin_utilities import AdminUtilities, db
+from admin.class_admin_utilities import AdminUtilities
 
 
 class AllStudentsController:
@@ -25,8 +24,9 @@ class AllStudentsController:
 
     def __init__(self, ui: Ui_AllStudents, admin_utils: AdminUtilities):
         self.ui = ui
-        self.admin = admin_utils               # admin object (business logic)
+        self.admin_utils = admin_utils               # admin object (business logic)
         self.db = admin_utils.db               # DatabaseUtilities instance
+
         self.students_data = []                # Holds all active students
         self.blf = BaseLoginForm()             # For confirmations and animations
 
@@ -238,7 +238,7 @@ class AllStudentsController:
             f"Are you sure you want to remove student ID {user_id}?"
         )
         if reply == QMessageBox.StandardButton.Yes:
-            msg = self.admin.admin_delete_student(user_id)
+            msg = self.admin_utils.admin_delete_student(user_id)
             print(msg)
             self.load_students()
 
@@ -278,7 +278,7 @@ class AllStudentsController:
             if reply != QMessageBox.StandardButton.Yes:
                 return
 
-            msg = self.admin.admin_delete_all_students()
+            msg = self.admin_utils.admin_delete_all_students()
             print(msg)
             self.load_students()
             return
@@ -292,7 +292,7 @@ class AllStudentsController:
             return
 
         for uid in selected_ids:
-            self.admin.admin_delete_student(uid)
+            self.admin_utils.admin_delete_student(uid)
 
         self.load_students()
 
@@ -324,8 +324,14 @@ class AllStudentsController:
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
 
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
     admin_utils = AdminUtilities(db)
+
 
     window = QWidget()
     ui = Ui_AllStudents()

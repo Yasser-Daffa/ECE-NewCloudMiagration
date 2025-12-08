@@ -10,8 +10,6 @@ from app_ui.admin_ui.submenus_ui.ui_profile import Ui_Profile
 from helper_files.shared_utilities import info, warning, error
 from helper_files.validators import validate_email
 
-from admin.class_admin_utilities import db
-
 
 class ProfileWidget(QWidget):
     """
@@ -23,18 +21,20 @@ class ProfileWidget(QWidget):
     - Updates email in the database using update_user()
     """
 
-    def __init__(self, admin_user_data, parent=None):
+    def __init__(self, admin_utils, admin_user_data, parent=None):
         """
-        admin_user_data → (user_id, name, email, program, state, account_status)
+        admin_user_data -> (user_id, name, email, program, state, account_status)
         """
         super().__init__(parent)
 
-        # ----------------- Setup UI -----------------
         self.ui = Ui_Profile()
         self.ui.setupUi(self)
 
+        # Store utilities
+        self.admin_utils = admin_utils
+        self.db = admin_utils.db
+
         # ----------------- Store DB and user info -----------------
-        self.db = db
         self.admin_id = admin_user_data[0]
         self.name = admin_user_data[1]
         self.email = admin_user_data[2]
@@ -55,10 +55,6 @@ class ProfileWidget(QWidget):
         # ----------------- Connect buttons -----------------
         self.ui.buttonEditEmail.clicked.connect(self.save_changes)
 
-        # Hide unused Edit button if present in UI file
-        if hasattr(self.ui, "buttonEdit"):
-            self.ui.buttonEdit.setEnabled(False)
-            self.ui.buttonEdit.hide()
 
         # ----------------- Track changes in fields -----------------
         # Only email is editable, so only track email field
@@ -83,15 +79,15 @@ class ProfileWidget(QWidget):
     # ---------------------------------------------------------
     def set_dirty(self, dirty: bool):
         """
-        dirty = True  → enable Save
-        dirty = False → disable Save
+        dirty = True  -> enable Save
+        dirty = False -> disable Save
         """
         self.ui.buttonEditEmail.setEnabled(dirty)
 
     def on_fields_changed(self):
         """
         Triggered automatically whenever the email field changes.
-        If new email ≠ old email → enable Save.
+        If new email =! old email -> enable Save.
         """
         current_email = self.ui.lineEditEmail.text().strip()
         dirty = (current_email != self._original_email)

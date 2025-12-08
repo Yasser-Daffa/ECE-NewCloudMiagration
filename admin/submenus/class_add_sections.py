@@ -17,8 +17,6 @@ from app_ui.admin_ui.submenus_ui.ui_add_sections_dialog import Ui_AddSectionDial
 from helper_files.shared_utilities import BaseLoginForm
 
 # Pre-built admin instance
-from admin.class_admin_utilities import admin
-
 
 class AddSectionDialog(QDialog, BaseLoginForm):
     """
@@ -35,7 +33,8 @@ class AddSectionDialog(QDialog, BaseLoginForm):
         self.ui = Ui_AddSectionDialog()
         self.ui.setupUi(self)
 
-        self.admin_utils = admin_utils     # this is the ready-made admin instance
+        self.admin_utils = admin_utils    # this is the ready-made admin instance
+        self.db = admin_utils.db
 
         # Prepare course combo box using data from the courses table
         self.populate_courses_combo()
@@ -267,7 +266,15 @@ class AddSectionDialog(QDialog, BaseLoginForm):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    dialog = AddSectionDialog(admin)
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    dialog = AddSectionDialog(admin_utils)
     dialog.show()
 
     sys.exit(app.exec())

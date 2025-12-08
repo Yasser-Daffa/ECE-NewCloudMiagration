@@ -1,16 +1,21 @@
 import time
 import psycopg2
 from psycopg2.pool import SimpleConnectionPool
-from helper_files.shared_utilities import warning
 
 
 # ================== SUPABASE SESSION POOLER CONFIG ==================
 
-SUPABASE_HOST = "aws-1-eu-central-1.pooler.supabase.com"
-SUPABASE_PORT = 5432
-SUPABASE_DB   = "postgres"
-SUPABASE_USER = "postgres.toymjvjmecmntvltwwmb"
-SUPABASE_PASS = "Yaser@123"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SUPABASE_HOST = os.getenv("SUPABASE_HOST")
+SUPABASE_PORT = os.getenv("SUPABASE_PORT")
+SUPABASE_USER = os.getenv("SUPABASE_USER")
+SUPABASE_PASS = os.getenv("SUPABASE_PASS")
+SUPABASE_DB = os.getenv("SUPABASE_DB")
+
 
 
 # =====================================================================

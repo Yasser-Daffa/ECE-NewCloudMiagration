@@ -5,7 +5,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import QTimer
 from admin.class_admin_utilities import AdminUtilities
-from admin.class_admin_utilities import admin, db
 from database_files.cloud_database import is_connected_to_db
 
 # Subpage UI & Controller imports
@@ -51,10 +50,15 @@ class AdminDashboard(QtWidgets.QMainWindow):
         # -------------------------------
         self.ui = Ui_AdminDashboard()
         self.ui.setupUi(self)
+
+        # Takes db from outside (from main.py’s pooled connection).
+        # Creates AdminUtilities from that db.
+        # Passes self.admin into all subpages.
+        # All subpages are wired using self.admin.
         self.db = db
+        self.admin = AdminUtilities(self.db)
         self.user_info = user_info
         self.user_id, self.name, self.email, self.program, self.state, self.account_status, self.hashed_pw = user_info
-        self.admin = AdminUtilities(self.db)
         
         # Displays the name at the top-left side near the pfp
         self.ui.labelAdminName.setText(self.name)
@@ -81,7 +85,7 @@ class AdminDashboard(QtWidgets.QMainWindow):
         self.ui.stackedWidget.addWidget(self.pending_requests_page)
 
         self.ui.stackedWidget.addWidget(self.manage_students_page)
-        self.ui.stackedWidget.addWidget(self.manage_faculty_controller)
+        self.ui.stackedWidget.addWidget(self.manage_faculty_page)
 
         self.ui.stackedWidget.addWidget(self.manage_courses_page)
         self.ui.stackedWidget.addWidget(self.manage_prereqs_page)
@@ -103,7 +107,7 @@ class AdminDashboard(QtWidgets.QMainWindow):
             self.ui.buttonPendingRequests: ("Pending Requests", self.pending_requests_page),
 
             self.ui.buttonManageStudents: ("Manage Students", self.manage_students_page),
-            self.ui.buttonManageFaculty: ("Manage Faculty", self.manage_faculty_controller),
+            self.ui.buttonManageFaculty: ("Manage Faculty", self.manage_faculty_page),
 
             self.ui.buttonManageCourses: ("Manage Courses", self.manage_courses_page),
             self.ui.buttonManagePrereqs: ("Manage Prereqs", self.manage_prereqs_page),
@@ -144,22 +148,26 @@ class AdminDashboard(QtWidgets.QMainWindow):
         Create QWidget pages, set up their UI, and attach controllers.
         Controllers must be initialized AFTER widget + UI exist.
         """
+
+        # all of these use admin_utils, and admin_utils uses database_utils
+        # a tree like this: page -> admin_utils -> database_utils
+
+
         # -------------------------------
         # Profile page
         # -------------------------------
 
-        self.profile_page = ProfileWidget(self.user_info)
+        self.profile_page = ProfileWidget(self.admin, self.user_info)
 
 
         # -------------------------------
         # All Students page
         # -------------------------------
-        # Uses direct database_utilities access
         self.all_students_page = QtWidgets.QWidget()
         self.all_students_ui = Ui_AllStudents()
         self.all_students_ui.setupUi(self.all_students_page)
+        
 
-        # نمرر كائن الأدمن (self.admin) للكنترولر
         self.all_students_controller = AllStudentsController(self.all_students_ui, self.admin)
 
         # -------------------------------
@@ -168,8 +176,8 @@ class AdminDashboard(QtWidgets.QMainWindow):
         self.pending_requests_page = QtWidgets.QWidget()
         self.pending_requests_ui = Ui_PendingRequestsWidget()
         self.pending_requests_ui.setupUi(self.pending_requests_page)
-        # Uses direct database_utilities access
-        self.pending_requests_controller = PendingRequestsController(self.pending_requests_ui, admin)
+
+        self.pending_requests_controller = PendingRequestsController(self.pending_requests_ui, self.admin)
 
         # -------------------------------
         # Manage students page
@@ -177,15 +185,14 @@ class AdminDashboard(QtWidgets.QMainWindow):
         self.manage_students_page = QtWidgets.QWidget()
         self.manage_students_ui = Ui_ManageStudents()
         self.manage_students_ui.setupUi(self.manage_students_page)
-        # uses direct database access
         self.manage_students_controller = ManageStudentsController(self.manage_students_ui, self.admin)
 
 
         # -------------------------------
         # Manage facutly page
         # -------------------------------
-        # uses database utils
-        self.manage_faculty_controller = ManageFacultyWidget(db)
+        # sets up its own ui in the class
+        self.manage_faculty_page = ManageFacultyWidget(self.admin)
 
         # -------------------------------
         # Manage courses
@@ -193,8 +200,7 @@ class AdminDashboard(QtWidgets.QMainWindow):
         self.manage_courses_page = QtWidgets.QWidget()
         self.manage_courses_ui = Ui_ManageCourses()
         self.manage_courses_ui.setupUi(self.manage_courses_page)
-        # Uses direct database_utilities access
-        self.manage_courses_controller = ManageCoursesController(self.manage_courses_ui, self.db)
+        self.manage_courses_controller = ManageCoursesController(self.manage_courses_ui, self.admin)
 
         # -------------------------------
         # Manage prereqs
@@ -202,20 +208,19 @@ class AdminDashboard(QtWidgets.QMainWindow):
         self.manage_prereqs_page = QtWidgets.QWidget()
         self.manage_prereqs_ui = Ui_ManagePrereqs()
         self.manage_prereqs_ui.setupUi(self.manage_prereqs_page)
-        # Uses admin_utilities and direct database_utilites
-        self.manage_prereqs_controller = ManagePrerequisitesController(self.manage_prereqs_ui, self.admin, self.db)
+        self.manage_prereqs_controller = ManagePrerequisitesController(self.manage_prereqs_ui, self.admin)
 
         # -------------------------------
         # Manage sections
         # -------------------------------
         # # no need for all the extra junk since this page sets up its own ui internally. thanks to salem :)
-        self.manage_sections_page = ManageSectionsWidget(admin)
+        self.manage_sections_page = ManageSectionsWidget(self.admin)
 
 
         # -------------------------------
         # Program Plans
         # -------------------------------
-        self.program_plans_page = ProgramPlansWidget(admin)
+        self.program_plans_page = ProgramPlansWidget(self.admin)
 
     # -------------------------------
     # Switch the stacked widget to the page associated with the clicked button
@@ -261,7 +266,7 @@ class AdminDashboard(QtWidgets.QMainWindow):
         """ method to return back to the login/create account screen
         mainly used by the "logout" button when pressed """
         from login_files.class_authentication_window import AuthenticationWindow
-        self.authentication_window = AuthenticationWindow()
+        self.authentication_window = AuthenticationWindow(self.db)
         self.authentication_window.show()
 
 
@@ -276,19 +281,28 @@ class AdminDashboard(QtWidgets.QMainWindow):
     
 
 
-# ------------------------------- MAIN APP -------------------------------
+# ------------------------------- MAIN APP (TEST ONLY) -------------------------------
 if __name__ == "__main__":
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+
     app = QtWidgets.QApplication(sys.argv)
 
-    user_id = None
-    user_name = None
-    user_email = None
-    user_program = None
-    state = None
-    account_status = None
-    hashed_pw = None
+    # Create pooled DB connection for testing
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
 
-    user_info = user_id, user_name, user_email, user_program, state, account_status, hashed_pw
-    window = AdminDashboard(db, user_info)
+    # Fake admin user info for testing
+    fake_user_info = (
+        9999999,              # user_id
+        "Test Admin",         # name
+        "admin@example.com",  # email
+        "ADMIN",              # program/role
+        "admin",              # state
+        "active",             # account_status
+        "fake_hash"           # hashed password
+    )
+
+    window = AdminDashboard(db, fake_user_info)
     window.show()
     sys.exit(app.exec())

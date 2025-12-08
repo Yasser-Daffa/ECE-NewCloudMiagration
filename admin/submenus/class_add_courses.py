@@ -10,7 +10,6 @@ from app_ui.admin_ui.submenus_ui.ui_add_courses_dialog import Ui_AddCourseDialog
 from helper_files.shared_utilities import BaseLoginForm
 
 # Use the ready-made admin instance from class_admin_utilities
-from admin.class_admin_utilities import admin   # Note: we import the instance, not just the class
 
 
 class AddCoursesDialog(QDialog, BaseLoginForm):
@@ -32,6 +31,7 @@ class AddCoursesDialog(QDialog, BaseLoginForm):
 
         # admin_utils is expected to be an object that exposes add_course
         self.admin_utils = admin_utils
+        self.db = admin_utils.db
 
         # Initially disable the Save button until required fields are valid
         self.ui.buttonSave.setEnabled(False)
@@ -171,8 +171,15 @@ class AddCoursesDialog(QDialog, BaseLoginForm):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    # For testing: pass the global admin instance into the dialog
-    dialog = AddCoursesDialog(admin)
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    dialog = AddCoursesDialog(admin_utils)
     dialog.show()
 
     sys.exit(app.exec())

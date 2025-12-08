@@ -10,7 +10,7 @@ from PyQt6.QtCore import Qt
 
 from app_ui.admin_ui.submenus_ui.ui_pending_requests import Ui_PendingRequestsWidget
 from helper_files.shared_utilities import BaseLoginForm, EmailSender
-from admin.class_admin_utilities import admin  # Using the global admin utilities instance
+from admin.class_admin_utilities import AdminUtilities
 
 
 class PendingRequestsController:
@@ -29,9 +29,11 @@ class PendingRequestsController:
         - Send email notification upon approval or rejection
     """
 
-    def __init__(self, ui: Ui_PendingRequestsWidget, admin_utils=admin):
+    def __init__(self, ui: Ui_PendingRequestsWidget, admin_utils: AdminUtilities):
         self.ui = ui
         self.admin = admin_utils               # AdminUtilities instance
+        self.db = admin_utils.db
+
         self.students_data = []                # Cached list of pending students
         self.animate = BaseLoginForm.animate_label_with_dots
         self.blf = BaseLoginForm()
@@ -409,7 +411,15 @@ if __name__ == "__main__":
     ui = Ui_PendingRequestsWidget()
     ui.setupUi(window)
 
-    controller = PendingRequestsController(ui, admin)
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    controller = PendingRequestsController(ui, admin_utils)
 
     window.show()
     sys.exit(app.exec())

@@ -10,7 +10,7 @@ from PyQt6.QtCore import Qt
 from app_ui.admin_ui.submenus_ui.ui_manage_students import Ui_ManageStudents
 from helper_files.shared_utilities import BaseLoginForm
 from database_files.class_database_uitlities import DatabaseUtilities
-from admin.class_admin_utilities import AdminUtilities, db
+from admin.class_admin_utilities import AdminUtilities
 
 # Register courses page for a student
 from student.submenus.class_register_courses import RegisterCoursesWidget
@@ -40,6 +40,7 @@ class ManageStudentsController:
         self.ui = ui
         self.admin = admin_utils
         self.db = admin_utils.db
+
         self.students_data = []
         self.blf = BaseLoginForm()
 
@@ -303,7 +304,7 @@ class ManageStudentsController:
             return
 
         # Create the AddGradesDialog (admin_utils is already available)
-        self.add_grades_window = AddGradesDialog(self.admin, self.db)
+        self.add_grades_window = AddGradesDialog(self.admin)
         self.add_grades_window.show()
 
     # ----------------------------------------------------
@@ -319,6 +320,13 @@ class ManageStudentsController:
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
+
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
     admin_utils = AdminUtilities(db)
 
     window = QWidget()

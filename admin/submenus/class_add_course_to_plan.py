@@ -1,18 +1,13 @@
 import os
 import sys
 
-from PyQt6.QtWidgets import (
-    QApplication,
-    QDialog,
-    QMessageBox,
-)
+from PyQt6.QtWidgets import QApplication, QDialog
 
 # Add the main project directory to sys.path so imports work correctly
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 from app_ui.admin_ui.submenus_ui.ui_add_course_to_plan_dialog import Ui_AddCourseDialog
-from admin.class_admin_utilities import admin
-from helper_files.shared_utilities import warning, info, error
+from helper_files.shared_utilities import info, error
 
 
 class AddCourseToPlanDialog(QDialog):
@@ -31,6 +26,7 @@ class AddCourseToPlanDialog(QDialog):
         self.ui.setupUi(self)
 
         self.admin_utils = admin_utils
+        self.db = admin_utils.db
 
         # Fill combo boxes on startup
         self.populate_courses_combo()
@@ -134,6 +130,17 @@ class AddCourseToPlanDialog(QDialog):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    dlg = AddCourseToPlanDialog(admin)
+
+
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+    admin_utils = AdminUtilities(db)
+
+    dlg = AddCourseToPlanDialog(admin_utils)
+
     dlg.show()
     sys.exit(app.exec())

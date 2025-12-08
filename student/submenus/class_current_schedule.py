@@ -1,21 +1,26 @@
 import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
 from PyQt6.QtWidgets import QWidget, QApplication, QTableWidgetItem, QHeaderView
 from PyQt6.QtCore import Qt
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+from student.class_student_utilities import StudentUtilities
+from admin.class_admin_utilities import AdminUtilities
 
 from app_ui.student_ui.submenus_ui.ui_current_schedule import Ui_CurrentSchedule
-from student.class_student_utilities import StudentUtilities, db
+
 
 
 class CurrentScheduleWidget(QWidget):
-    def __init__(self, student_id: int, parent=None):
+    def __init__(self, student_utils, admin_utils, parent=None):
         super().__init__(parent)
         self.ui = Ui_CurrentSchedule()
         self.ui.setupUi(self)
+        
+        self.student_utils = student_utils
+        self.admin_utils = admin_utils
+        self.db = student_utils.db
 
-        self.student_id = student_id
-        self.student_utils = StudentUtilities(db, student_id)
         self.registered_courses = []
 
         # Add Refresh button
@@ -152,7 +157,20 @@ class CurrentScheduleWidget(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    w = CurrentScheduleWidget(student_id=2500001)
+
+    from database_files.cloud_database import get_pooled_connection
+    from database_files.class_database_uitlities import DatabaseUtilities
+    from student.class_student_utilities import StudentUtilities
+    from admin.class_admin_utilities import AdminUtilities
+
+    con, cur = get_pooled_connection()
+    db = DatabaseUtilities(con, cur)
+
+    student_utils = StudentUtilities(db, 2500001)
+    admin_utils = AdminUtilities(db)
+
+    w = CurrentScheduleWidget(student_utils, admin_utils)
+
     w.show()
     sys.exit(app.exec())
 
