@@ -14,21 +14,27 @@ Honesty: This project wouldn't have been possible to make in such a short period
 
 ### Student Dashboard
 - View current schedule  
-- Register courses with prerequisite & seat validation  
-- View degree plan & program requirements  
+- Register courses with prerequisite & seat validation (section capacity)
+- View degree/program plan & program prerequisites
 - View completed courses, grades, and transcript  
 - Profile management with email verification  
-- Real-time cloud-connection indicator  
-- Smooth animated transitions and clean UI
+ 
 
 ### Admin Dashboard
 - Manage students, faculty, courses, sections, grades  
 - Approve or reject new student accounts  
-- Edit program study plans  
+- Set program study plans and ability to edit them  
 - Set prerequisites for each course  
-- View system statistics  
-- Add / update / delete academic records  
-- Cloud-powered data persistence
+- View system statistics (partially implemented)
+
+### Shared between the two dashboards
+- Real-time cloud-connection indicator
+- Powerful sign-in/account creation window
+- Neat looking design
+- Clean UI
+- Made with love (and a loss of mental sanity)
+
+
 
 ---
 
@@ -41,18 +47,21 @@ Honesty: This project wouldn't have been possible to make in such a short period
 | **Database (Cloud)** | Supabase PostgreSQL (Free Tier) |
 | **Local DB (Initial)** | SQLite |
 | **Security** | bcrypt password hashing, email verification |
-| **Architecture** | Multi-window MVC with shared utilities |
+| **Architecture** | Multi-window MVC* with shared utilities |
+
+MVC*: model view controller
 
 ---
 
 # Database Migration Notes (SQLite -> Cloud PostgreSQL)
 
 ### Why We Migrated
-The original design ran on SQLite and worked locally but had issues:
+The original design ran on SQLite and worked locally, but had issues:
 - No concurrency support  
 - No remote access  
-- No 
-- Difficult to scale or deploy  
+- No real multi-user capability  
+- Only one person can access the local .db file at a time. else it would result in a coruption due to the file's binary nature
+- Caused us emotional damage during testing
 
 ### Migration Steps
 1. **Rewrote SQL schemas** to match PostgreSQL's structure.  
@@ -68,10 +77,12 @@ The original design ran on SQLite and worked locally but had issues:
 5. Reworked authentication & email verification to fully support cloud workflows.
 
 ### Cloud Challenges Solved
-- PostgreSQL session mode limits (MaxClientsInSessionMode errors)  
-- Excessive connection creation → fixed using a **single shared pool**  
-- Query timeouts → resolved with shorter, optimized SELECTs  
-- Real-time "Online/Offline" monitoring  
+- PostgreSQL session mode limits (MaxClientsInSessionMode errors)
+- Excessive connection creation -> fixed using a **single shared pool**  
+- Query timeouts -> resolved with shorter, optimized SELECTs  
+- Real-time "Online/Offline" monitoring
+- Dead sessions... session would die after 4 mins of inactivity (had to write a method to reconnect safely)
+- ^^^^^^^^^^^^^^^ This part in particular was a headache to figure out. "WHY IS THE PROGRAM CRASHING AFTER A 2 SECONDS OF NOT USING IT"
 
 ---
 
@@ -99,9 +110,9 @@ app/
 │ └── migrated SQL schemas
 │
 └── helper_files/
-├── shared_utilities.py # Common UI helpers
-├── validators.py # Password hashing, input validation
-└── email_sender.py
+   ├── shared_utilities.py # Common UI helpers
+   ├── validators.py # Password hashing, input validation
+   └── email_sender.py
 
 
 ---
@@ -109,16 +120,17 @@ app/
 # Installation (User)
 
 ### 1. Download the release folder  
-go to dir folder, then output. you will a setup file there. download the latest one always, as it has the most recent bug fixes
+go to `dir` folder -> then `output`.
+Inside it you will a **setup file**. download the latest one always, as it has the most recent bug fixes
 
-example path:
+Example path:
 dir/output_v2/setup.exe
-
-download this  ^^^^^^^
+*download this* ^^^^^^^
 
 ### 2. Run:
-launch the setup.exe file and proceed normally
+launch the **setup.exe** file and proceed normally
 
+---
 
 # Setting Up Your Own Cloud Database (Supabase PostgreSQL)
 
@@ -129,31 +141,30 @@ If you want to host your own version of this project, follow these steps to crea
 ## 0. Requirements
 Before starting, make sure you have:
 
-- Python 3.11+ installed
+- Python 3.13+ installed
 - A code editor (VS Code, PyCharm, etc.)
 - Internet connection
-- The following Python packages:
+- The following Python packages installed:
 
-Install them in your terminal:
-- pip install python-dotenv psycopg2
+   - pip install python-dotenv psycopg2
 
-- pip install bcrypt
+   - pip install bcrypt
 
-- pip install smtplib
+   - pip install smtplib
 
 
 ---
 
 ## 1. Create a Supabase Account
 1. Visit https://supabase.com  
-2. Sign up (you can use GitHub or email)
+2. Sign up (GitHub or email is fine)
 3. Click **New Project**
 
 Make sure you select:
 
 - **PostgreSQL database**
-- **Region close to you**  
-- Use the **Free Plan** (more than enough for this project)
+- A **Region close to you**  
+- **Free Plan** (more than enough for this project)
 
 ---
 
@@ -178,26 +189,24 @@ You will paste these into the project in the next step.
 
 ## 3. Configure the Project to Use Your Database
 
-1. Download this repository:
-Click Code → Download ZIP
-Unzip the folder.
+1. Download this repository; <> Code -> then Download ZIP  
+2. Extract it  
+3. Open the folder in your IDE  
+4. Go to:
 
-
-2. Open the project folder in your IDE.
-
-3. Navigate to:
 database_files/cloud_database.py
 
 
-4. Find these lines:
+5. Find these lines:
 
 ```python
 SUPABASE_HOST = ""
 SUPABASE_USER = ""
 SUPABASE_PASSWORD = ""
+
 SUPABASE_DB = ""
 
-5. Replace them with your credentials from Supabase:
+5. Replace them with your actual credentials from Supabase:
 Example:
     SUPABASE_HOST = "aws-xyz-123.supabase.co"
     SUPABASE_USER = "postgres"
@@ -207,8 +216,23 @@ Example:
     
 ---
 
-4. Initialize the Database Tables
+## 4. Initialize the Database Tables
 
+- Inside Supabase:
+
+   1. Go to the SQL Editor
+
+   2. Copy the schema located in:
+
+database_files/schemas/supabase_schema.sql
+
+   3. Paste it into Supabase’s SQL editor
+
+   4. Run it
+
+   5. This will automatically create all tables, foreign keys, indexes, and relationships needed for the system.
+
+If you want to reset the database at any time, simply re-run the schema file.
 
 
 
@@ -217,8 +241,8 @@ Example:
 
 | Name         | Role                                         |
 | ------------ | -------------------------------------------- |
-| Yasser       | Project Lead, GUI development, Cloud Migration, GUI and Backend connection |
-| Yehya        | Password Authenticators, Error handling/Testing|
+| Yasser       | Project Lead, GUI development, Cloud Migration, GUI ↔ Backend connection |
+| Salim        | Backend Logic (Database setup, Admin Class), GUI ↔ Backend connection |
+| Ahmed        | Backend Logic (Database setup, Student Class, Cloud Migration) |
 | Mohanned     | Email/Username/ID Authenticators, Error handling/Testing |
-| Ahmed        | Backend Logic (Database setup + Student Class + Cloud Migration) |
-| Salim        | Backend Logic (Database setup + Admin Class), GUI and Backend connection |
+| Yehya        | Password Authenticators, Error handling/Testing|
