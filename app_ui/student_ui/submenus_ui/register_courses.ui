@@ -211,7 +211,7 @@ QPushButton:pressed {
         <string notr="true">font-size: 12px; color: #7f8c8d; background: transparent; padding: 10px;</string>
        </property>
        <property name="text">
-        <string>ℹ️ Select prerequisites from the lists. Students must complete all prerequisites before registering for this course.</string>
+        <string>ℹ️ Students must complete all prerequisites before registering for certain courses.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

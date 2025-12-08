@@ -312,7 +312,7 @@ class Ui_RegisterCourses(object):
         self.lineEditSearch.setPlaceholderText(_translate("RegisterCourses", "🔍  Search by Course name or code..."))
         self.buttonRefresh.setText(_translate("RegisterCourses", "🔄 Refresh"))
         self.labelStatus.setText(_translate("RegisterCourses", "REGISTRATION STATUS: OPEN"))
-        self.labelInfo.setText(_translate("RegisterCourses", "ℹ️ Select prerequisites from the lists. Students must complete all prerequisites before registering for this course."))
+        self.labelInfo.setText(_translate("RegisterCourses", "ℹ️ Students must complete all prerequisites before registering for certain courses."))
         self.tableTitle.setText(_translate("RegisterCourses", "All Courses"))
         self.buttonViewSections.setText(_translate("RegisterCourses", " View Availabe Sections"))
         self.tableAllCourses.setSortingEnabled(True)
