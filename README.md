@@ -125,7 +125,7 @@ Inside it you will a **setup file**. download the latest one always, as it has t
 
 Example path:
 dir/output_v2/setup.exe
-- *download this* ^^^^^^^
+ - *download this* ^^^^^^^
 
 ### 2. Run:
 launch the **setup.exe** file and proceed normally
