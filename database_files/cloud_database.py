@@ -60,8 +60,8 @@ def _create_pool():
     This prevents crashes upon import when offline.
     """
     return SimpleConnectionPool(
-        minconn=1,
-        maxconn=10,
+        minconn=3,
+        maxconn=15,
         host=SUPABASE_HOST,
         port=SUPABASE_PORT,
         database=SUPABASE_DB,

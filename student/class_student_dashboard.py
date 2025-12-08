@@ -104,7 +104,13 @@ class StudentDashboard(QtWidgets.QMainWindow):
         # Show default page (should be profile first)
         self.switch_to_page(self.ui.buttonProfile)
         # updates connection status label based on user's connection to cloud database
+        # Update status once now
         self.update_connection_status()
+
+        # Auto refresh every 5 seconds
+        self.status_timer = QTimer(self)
+        self.status_timer.timeout.connect(self.update_connection_status)
+        self.status_timer.start(5000)
         
 
     # -------------------------------
