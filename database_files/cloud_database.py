@@ -1,3 +1,10 @@
+import sys
+# Fix for PyInstaller: ensure python-dotenv is discoverable
+if hasattr(sys, '_MEIPASS'):
+    import os
+    os.environ['PYTHONPATH'] = sys._MEIPASS
+
+
 import time
 import psycopg2
 from psycopg2.pool import SimpleConnectionPool

@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "ECE Course Registration"
-#define MyAppVersion "1.0"
+#define MyAppVersion "v2"
 #define MyAppPublisher "ECE Lions, Inc."
 #define MyAppURL "https://github.com/Yasser-Daffa/ECE-Course-Registeration"
 #define MyAppExeName "ECECourseRegistration.exe"
