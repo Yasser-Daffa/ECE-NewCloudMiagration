@@ -1,8 +1,32 @@
-import sys
-# Fix for PyInstaller: ensure python-dotenv is discoverable
-if hasattr(sys, '_MEIPASS'):
-    import os
-    os.environ['PYTHONPATH'] = sys._MEIPASS
+from dotenv import load_dotenv
+import os, sys
+
+from dotenv import load_dotenv
+import os, sys
+
+def load_env():
+    # CASE 1: Running as a PyInstaller EXE
+    if getattr(sys, 'frozen', False):
+        # location of files packaged by PyInstaller
+        exe_dir = sys._MEIPASS  
+
+        env_path = os.path.join(exe_dir, ".env")
+        if os.path.exists(env_path):
+            load_dotenv(env_path)
+            return
+
+        # fallback: maybe user placed .env next to the EXE manually
+        exe_folder = os.path.dirname(sys.executable)
+        env_path_2 = os.path.join(exe_folder, ".env")
+        if os.path.exists(env_path_2):
+            load_dotenv(env_path_2)
+            return
+
+    # CASE 2: Normal Python script
+    load_dotenv()
+
+load_env()
+
 
 
 import time
@@ -12,10 +36,9 @@ from psycopg2.pool import SimpleConnectionPool
 
 # ================== SUPABASE SESSION POOLER CONFIG ==================
 
-import os
-from dotenv import load_dotenv
+# import os
+# from dotenv import load_dotenv
 
-load_dotenv()
 
 SUPABASE_HOST = os.getenv("SUPABASE_HOST")
 SUPABASE_PORT = os.getenv("SUPABASE_PORT")

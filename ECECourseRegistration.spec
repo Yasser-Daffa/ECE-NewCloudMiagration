@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('app_ui', 'app_ui'), ('admin', 'admin'), ('student', 'student'), ('login_files', 'login_files'), ('helper_files', 'helper_files'), ('database_files', 'database_files')]
+datas = [('.env', '.'), ('app_ui', 'app_ui'), ('admin', 'admin'), ('student', 'student'), ('login_files', 'login_files'), ('helper_files', 'helper_files'), ('database_files', 'database_files')]
 binaries = []
 hiddenimports = ['dotenv', 'dotenv.main', 'python_dotenv', 'psycopg2', 'smtplib', 'email', 'email.mime.text', 'email.mime.multipart', 'ssl', 'socket', 'urllib', 'urllib.request', 'json', 'bcrypt']
 tmp_ret = collect_all('psycopg2')
@@ -45,4 +45,13 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=['app.ico'],
+)
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='ECECourseRegistration'
 )
