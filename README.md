@@ -228,9 +228,7 @@ Example:
 
    1. Go to the SQL Editor
 
-   2. Copy the schema located in:
-
-database_files/schemas/supabase_schema.sql
+   2. Copy the schema located in: database_files/schemas/supabase_schema.sql
 
    3. Paste it into Supabase’s SQL editor
 
