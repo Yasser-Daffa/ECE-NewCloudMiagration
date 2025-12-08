@@ -88,31 +88,36 @@ The original design ran on SQLite and worked locally, but had issues:
 
 # System Architecture
 
-app/
-│
-├── login_files/                 # Authentication system (student/admin login)
-│   ├── class_authentication_window.py
-│   └── email verification, password reset, stacked UI
-│
-├── student/
-│   ├── class_student_dashboard.py
-│   ├── submenus/                # Profile, schedule, program plans, transcript, etc.
-│   └── class_student_utilities.py
-│
-├── admin/
-│   ├── class_admin_dashboard.py
-│   ├── submenus/                # Manage courses, sections, students, grades, etc.
-│   └── class_admin_utilities.py
-│
-├── database_files/
-│   ├── cloud_database.py        # Pooled connection, retry logic
-│   ├── class_database_uitlities.py
-│   └── migrated SQL schemas
-│
-└── helper_files/
-    ├── shared_utilities.py      # Common UI helpers
-    ├── validators.py            # Password hashing, input validation
-    └── email_sender.py
+SystemArchitecture: |
+  # System Architecture
+
+  ```text
+  app/
+  │
+  ├── login_files/                 # Authentication system (student/admin login)
+  │   ├── class_authentication_window.py
+  │   └── email verification, password reset, stacked UI
+  │
+  ├── student/
+  │   ├── class_student_dashboard.py
+  │   ├── submenus/                # Profile, schedule, program plans, transcript, etc.
+  │   └── class_student_utilities.py
+  │
+  ├── admin/
+  │   ├── class_admin_dashboard.py
+  │   ├── submenus/                # Manage courses, sections, students, grades, etc.
+  │   └── class_admin_utilities.py
+  │
+  ├── database_files/
+  │   ├── cloud_database.py        # Pooled connection, retry logic
+  │   ├── class_database_uitlities.py
+  │   └── migrated SQL schemas
+  │
+  └── helper_files/
+      ├── shared_utilities.py      # Common UI helpers
+      ├── validators.py            # Password hashing, input validation
+      └── email_sender.py
+```
 
 
 
