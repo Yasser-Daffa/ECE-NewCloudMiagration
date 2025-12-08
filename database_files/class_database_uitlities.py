@@ -9,7 +9,7 @@ registrations, settings, login, and some helper checks.
 
 Now it is fully migrated to PostgreSQL (no SQLite).
 """
- 
+
 import time
 import psycopg2
 from database_files.cloud_database import get_pooled_connection
@@ -91,7 +91,7 @@ class DatabaseUtilities:
             raise RuntimeError(f"[DB] Failed to reconnect: {e}")
 
     # -----------------------------------------------------
-    # EXECUTION METHODS (UNTOUCHED INTERFACES)
+    # EXECUTION METHODS 
     # -----------------------------------------------------
     def execute(self, query, params=()):
         self.ensure_connection()
@@ -114,15 +114,12 @@ class DatabaseUtilities:
         return result
 
     # -----------------------------------------------------
-    # LEGACY API COMPATIBILITY (MUST KEEP)
+    # LEGACY API COMPATIBILITY 
     # -----------------------------------------------------
     def commit(self):
         self.ensure_connection()
         self.con.commit()
         self._last_used = time.time()
-
-
-
 
     # =========================================================
     # COURSES
@@ -136,6 +133,7 @@ class DatabaseUtilities:
         - name: course name (e.g., 'Electric Circuits 1')
         - credits: number of credit hours (e.g., 3)
         """
+        self.ensure_connection()
         try:
             self.cur.execute(
                 "INSERT INTO courses(code, name, credits) VALUES(%s, %s, %s)",
@@ -159,6 +157,7 @@ class DatabaseUtilities:
 
         If all are None -> nothing to update.
         """
+        self.ensure_connection()
         if new_code is None and new_name is None and new_credits is None:
             return "Nothing to update"
 
@@ -190,6 +189,7 @@ class DatabaseUtilities:
         Return a list of all courses (code, name, credits),
         ordered by course code.
         """
+        self.ensure_connection()
         self.cur.execute("SELECT code, name, credits FROM courses ORDER BY code")
         return self.cur.fetchall()
 
@@ -197,6 +197,7 @@ class DatabaseUtilities:
         """
         Delete a course by its code.
         """
+        self.ensure_connection()
         self.cur.execute("DELETE FROM courses WHERE code=%s", (code,))
         self.commit()
         return "Course deleted successfully"
@@ -208,6 +209,7 @@ class DatabaseUtilities:
         """
         Return a list of prerequisite course codes for the given course.
         """
+        self.ensure_connection()
         self.cur.execute(
             "SELECT prereq_code FROM requires WHERE course_code=%s ORDER BY prereq_code",
             (course_code,),
@@ -218,6 +220,7 @@ class DatabaseUtilities:
         """
         Add a prerequisite for a course.
         """
+        self.ensure_connection()
         try:
             self.cur.execute(
                 "INSERT INTO requires(course_code, prereq_code) VALUES(%s, %s)",
@@ -233,6 +236,7 @@ class DatabaseUtilities:
         """
         Update an existing prerequisite for a course.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             UPDATE requires
@@ -248,6 +252,7 @@ class DatabaseUtilities:
         """
         Delete a specific prerequisite from a course.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             DELETE FROM requires
@@ -277,6 +282,7 @@ class DatabaseUtilities:
         Add a new section for a course.
         enrolled is always started at 0.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             INSERT INTO sections(
@@ -305,6 +311,7 @@ class DatabaseUtilities:
         List sections with optional filters (course_code, semester).
         Returns all columns ordered by (course_code, section_id).
         """
+        self.ensure_connection()
         sql = """
         SELECT section_id, course_code, doctor_id, days, time_start,
                time_end, room, capacity, enrolled, semester, state
@@ -344,6 +351,7 @@ class DatabaseUtilities:
         """
         Update section data. Only provided fields will be updated.
         """
+        self.ensure_connection()
         sets = []
         vals = []
 
@@ -394,6 +402,7 @@ class DatabaseUtilities:
         """
         Delete a section by section_id.
         """
+        self.ensure_connection()
         self.cur.execute("DELETE FROM sections WHERE section_id=%s", (section_id,))
         self.commit()
         return "Section deleted successfully" if self.cur.rowcount else "Section not found"
@@ -406,6 +415,7 @@ class DatabaseUtilities:
         Add a new user (student / admin / instructor).
         Default account_status = 'inactive'.
         """
+        self.ensure_connection()
         try:
             self.cur.execute(
                 """
@@ -413,13 +423,13 @@ class DatabaseUtilities:
                 VALUES(%s, %s, %s, %s, %s, %s)
                 """,
                 (
-                name,
-                email, 
-                password, 
-                program, 
-                state, 
-                "active" if state in ("admin", "instructor") else "inactive"
-                )
+                    name,
+                    email,
+                    password,
+                    program,
+                    state,
+                    "active" if state in ("admin", "instructor") else "inactive",
+                ),
             )
             self.commit()
             return "User added successfully, please wait for final acceptance"
@@ -431,6 +441,7 @@ class DatabaseUtilities:
         """
         Return a list of all users (basic info).
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             SELECT user_id, name, email, program, state, account_status
@@ -451,6 +462,7 @@ class DatabaseUtilities:
         """
         Update user information. Only provided fields will be changed.
         """
+        self.ensure_connection()
         sets = []
         vals = []
 
@@ -490,6 +502,7 @@ class DatabaseUtilities:
         Login user using (user_id, password_h).
         Returns one row or None.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             SELECT user_id, name, email, program, state, account_status
@@ -504,6 +517,7 @@ class DatabaseUtilities:
         """
         Return user info by user_id.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             SELECT user_id, name, email, program, state, account_status
@@ -518,6 +532,7 @@ class DatabaseUtilities:
         """
         Reset user password if (user_id, email) match.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             UPDATE users
@@ -538,6 +553,7 @@ class DatabaseUtilities:
         """
         Get user by login input (email or user_id).
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             SELECT user_id, name, email, program, state, account_status, password_h
@@ -552,6 +568,7 @@ class DatabaseUtilities:
         """
         Check if an email already exists in users table (case-insensitive).
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             SELECT 1 FROM users
@@ -569,6 +586,7 @@ class DatabaseUtilities:
         """
         Add a transcript record for a student/course/semester.
         """
+        self.ensure_connection()
         try:
             self.cur.execute(
                 """
@@ -587,6 +605,7 @@ class DatabaseUtilities:
         """
         List transcript rows for a student.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             SELECT course_code, semester, grade
@@ -602,6 +621,7 @@ class DatabaseUtilities:
         """
         Update only the grade for one course in one semester.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             UPDATE transcripts
@@ -625,6 +645,7 @@ class DatabaseUtilities:
         """
         Add a course to a program plan for a specific level.
         """
+        self.ensure_connection()
         try:
             self.cur.execute(
                 """
@@ -643,6 +664,7 @@ class DatabaseUtilities:
         """
         Delete a course from a specific program plan.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             DELETE FROM program_plans
@@ -672,6 +694,7 @@ class DatabaseUtilities:
 
         We match using program + course_code (case-insensitive).
         """
+        self.ensure_connection()
         old_program = (old_program or "").strip().upper()
         old_course_code = (old_course_code or "").strip().upper()
         new_program = (new_program or "").strip().upper()
@@ -704,6 +727,7 @@ class DatabaseUtilities:
         List program plan courses.
         If program is None -> list for all programs.
         """
+        self.ensure_connection()
         if program is None:
             self.cur.execute(
                 """
@@ -735,17 +759,23 @@ class DatabaseUtilities:
         Return list of sections the student is registered in.
         Each item is a row from sections.
         """
+        self.ensure_connection()
+        # Original logic: list sections (optionally by semester),
+        # then check per section if a registration exists.
+        # Optimized to avoid N+1 queries by doing one query
+        # for all section_ids the student is registered in.
         sections = self.list_sections(semester=semester)
-        registrations = []
 
-        for sec in sections:
-            sec_id = sec[0]  # section_id
-            self.cur.execute(
-                "SELECT 1 FROM registrations WHERE student_id=%s AND section_id=%s",
-                (student_id, sec_id),
-            )
-            if self.cur.fetchone():
-                registrations.append(sec)
+        # Get all section_ids where this student is registered
+        self.cur.execute(
+            "SELECT section_id FROM registrations WHERE student_id=%s",
+            (student_id,),
+        )
+        registered_ids_rows = self.cur.fetchall()
+        registered_ids = {row[0] for row in registered_ids_rows}
+
+        # Filter sections where section_id is in registered_ids
+        registrations = [sec for sec in sections if sec[0] in registered_ids]
 
         return registrations
 
@@ -754,6 +784,7 @@ class DatabaseUtilities:
         Return True if the student is registered in the section.
         (Semester filter is optional and depends on schema design.)
         """
+        self.ensure_connection()
         sql = """
             SELECT 1 FROM registrations
             WHERE student_id = %s AND section_id = %s
@@ -780,6 +811,7 @@ class DatabaseUtilities:
         If your current schema only has (student_id, section_id),
         you should add those two extra columns or adjust this function.
         """
+        self.ensure_connection()
         query = "SELECT student_id, section_id, course_code, semester FROM registrations WHERE 1=1"
         params = []
 
@@ -810,6 +842,7 @@ class DatabaseUtilities:
         - Check capacity/enrolled.
         - Update enrolled count in sections.
         """
+        self.ensure_connection()
         try:
             # 1) Get section data
             self.cur.execute(
@@ -887,6 +920,7 @@ class DatabaseUtilities:
 
         Returns True if something was deleted, False otherwise.
         """
+        self.ensure_connection()
         try:
             # 1) Get section_ids where student is registered in this course
             self.cur.execute(
@@ -954,6 +988,7 @@ class DatabaseUtilities:
             value TEXT
         );
         """
+        self.ensure_connection()
         try:
             self.cur.execute("SELECT value FROM settings WHERE key = %s", (key,))
             row = self.cur.fetchone()
@@ -968,6 +1003,7 @@ class DatabaseUtilities:
         """
         Insert or update a setting key/value.
         """
+        self.ensure_connection()
         try:
             self.cur.execute(
                 """
@@ -988,6 +1024,7 @@ class DatabaseUtilities:
         Returns True if registration is open, False otherwise.
         Default is True when the key is missing.
         """
+        # get_setting already ensures connection
         val = self.get_setting("registration_open", default="1")
         return str(val) == "1"
 
@@ -997,6 +1034,7 @@ class DatabaseUtilities:
         True  -> students can register/drop.
         False -> registration operations are blocked.
         """
+        # set_setting already ensures connection
         self.set_setting("registration_open", "1" if is_open else "0")
 
     # =========================================================
@@ -1006,6 +1044,7 @@ class DatabaseUtilities:
         """
         Return all users whose account_status = 'inactive'.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             SELECT user_id, name, email, program, state
@@ -1019,6 +1058,7 @@ class DatabaseUtilities:
         """
         Change all inactive users to active.
         """
+        self.ensure_connection()
         self.cur.execute(
             """
             UPDATE users
@@ -1032,6 +1072,7 @@ class DatabaseUtilities:
         """
         Delete all users whose account_status = 'inactive'.
         """
+        self.ensure_connection()
         self.cur.execute("DELETE FROM users WHERE account_status = 'inactive'")
         self.commit()
 
@@ -1043,6 +1084,7 @@ class DatabaseUtilities:
         Check if a student has a time conflict with a new section.
         Compares (days, time_start, time_end) with current registrations.
         """
+        self.ensure_connection()
         # New section
         self.cur.execute(
             """
@@ -1089,20 +1131,20 @@ class DatabaseUtilities:
         """
         Returns the last login timestamp for the user.
         """
+        self.ensure_connection()
         self.cur.execute(
             "SELECT last_login FROM login WHERE user_id = %s ORDER BY last_login DESC LIMIT 1",
-            (user_id,)
+            (user_id,),
         )
         row = self.cur.fetchone()
         return row[0] if row else None
-
-
 
     def update_last_login(self, user_id: int):
         """
         Update last login for a user in login table.
         If a row exists -> update; else -> insert new.
         """
+        self.ensure_connection()
         import datetime
 
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1132,6 +1174,7 @@ class DatabaseUtilities:
         Delete all users from the users table.
         Use carefully!
         """
+        self.ensure_connection()
         self.cur.execute("DELETE FROM users")
         self.commit()
 
@@ -1139,5 +1182,6 @@ class DatabaseUtilities:
         """
         Delete a single user by user_id.
         """
+        self.ensure_connection()
         self.cur.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
         self.commit()
