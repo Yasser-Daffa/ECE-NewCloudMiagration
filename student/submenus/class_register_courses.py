@@ -282,11 +282,13 @@ class RegisterCoursesWidget(QWidget):
 
         # Create sections widget with multiple courses
         sections_widget = ViewSectionsWidget(
-            student_id=self.student_utils.student_id,
+            student_utils=self.student_utils,
+            admin_utils=self.admin_utils,
             semester=self.semester,
             course_codes=course_codes,
             parent=dialog
         )
+
 
         layout.addWidget(sections_widget)
 

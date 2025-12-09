@@ -19,6 +19,8 @@ from student.submenus.class_current_schedule import CurrentScheduleWidget
 
 # Add Grades dialog (the one we built earlier)
 from admin.submenus.class_add_grades_dialog import AddGradesDialog
+from student.class_student_utilities import StudentUtilities
+
 
 
 class ManageStudentsController:
@@ -277,8 +279,15 @@ class ManageStudentsController:
         if student_id is None:
             return
 
-        self.register_window = RegisterCoursesWidget(student_id, semester=None)
+        student_utils = StudentUtilities(self.db, student_id)
+
+        self.register_window = RegisterCoursesWidget(
+            student_utils=student_utils,
+            admin_utils=self.admin,
+            semester=None
+        )
         self.register_window.show()
+
 
     # ----------------------------------------------------
     # Remove sections for student (open current schedule)
@@ -288,24 +297,27 @@ class ManageStudentsController:
         if student_id is None:
             return
 
-        self.current_schedule_window = CurrentScheduleWidget(student_id)
+        student_utils = StudentUtilities(self.db, student_id)
+
+        self.current_schedule_window = CurrentScheduleWidget(
+            student_utils=student_utils,
+            admin_utils=self.admin
+        )
         self.current_schedule_window.show()
+
 
     # ----------------------------------------------------
     # Add Grades for student
     # ----------------------------------------------------
     def handle_add_grades_for_student(self):
-        """
-        Opens AddGradesDialog for the selected student.
-        The dialog itself filters available courses based on student registration.
-        """
         student_id = self.get_single_selected_student_id()
         if student_id is None:
             return
 
-        # Create the AddGradesDialog (admin_utils is already available)
+        # Create dialog for adding grades
         self.add_grades_window = AddGradesDialog(self.admin)
         self.add_grades_window.show()
+
 
     # ----------------------------------------------------
     # Update student counter

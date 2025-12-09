@@ -213,7 +213,11 @@ class ManageFacultyWidget(QWidget):
         dialog.setStyleSheet("background: qlineargradient(x1:0, y1:0,x2:1, y2:1,stop:0 #f093fb,stop:1 #f5576c);")
 
         layout = QVBoxLayout(dialog)
-        signup_widget = SignupAndConfirmWindow(dialog)
+        signup_widget = SignupAndConfirmWindow(
+            admin_utils=self.admin_utils,   # <-- correct object
+            parent=dialog             # <-- optional
+        )
+
         layout.addWidget(signup_widget)
 
         signup_widget.destroyed.connect(lambda *_: self.load_admins())

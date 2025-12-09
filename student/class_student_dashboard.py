@@ -118,6 +118,10 @@ class StudentDashboard(QtWidgets.QMainWindow):
 
         # Show default page (should be profile first)
         self.switch_to_page(self.ui.buttonProfile)
+
+        # Track background threads to prevent premature destruction
+        self._connection_workers = []
+
         # updates connection status label based on user's connection to cloud database
         # Update status once now
         self.update_connection_status()
@@ -126,8 +130,6 @@ class StudentDashboard(QtWidgets.QMainWindow):
         self.status_timer = QTimer(self)
         self.status_timer.timeout.connect(self.update_connection_status)
         self.status_timer.start(5000)
-        # Track background threads to prevent premature destruction
-        self._connection_workers = []
 
 
     # -------------------------------
@@ -307,7 +309,7 @@ if __name__ == "__main__":
     db = DatabaseUtilities(con, cur)
 
     fake_user_info = (
-        2599999,             # user_id ()
+        2500003,             # user_id ()
         "Test Student",      # name
         "test@example.com",  # email
         "COMP",              # program

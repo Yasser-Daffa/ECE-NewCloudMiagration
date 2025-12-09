@@ -47,7 +47,7 @@ class ProgramPlansWidget(QWidget):
         self.ui.buttonAddCourse.clicked.connect(self.on_add_course_clicked)
         self.ui.comboBoxSelectProgram.currentIndexChanged.connect(self.load_plans)
         self.ui.comboBoxStatusFilter.currentIndexChanged.connect(self.load_plans)
-        self.ui.buttonEdit.clicked.connect
+        self.ui.buttonEdit.clicked.connect(self.on_edit_plan_clicked)
 
         table = self.ui.tableAllCourses
         table.setSelectionBehavior(table.SelectionBehavior.SelectRows)
