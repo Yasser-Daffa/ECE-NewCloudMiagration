@@ -139,38 +139,56 @@ def release_connection(con):
 #                       CONNECTIVITY CHECK
 # =====================================================================
 
+
 def is_connected_to_db():
     """
-    Returns True if database is reachable, False otherwise.
+    FAST, UI-safe connectivity check.
+
+    - Does NOT open new connections
+    - Does NOT run SQL
+    - Does NOT sleep
+    - Just checks if we have a usable pooled connection.
     """
+    global _pool
+
+    if _pool is None:
+        return False  # pool never created → not connected yet
+
     try:
-        con, cur = get_connection()
-        cur.execute("SELECT 1;")
-        cur.close()
-        con.close()
+        # Try taking a connection from the pool and returning it.
+        con = _pool.getconn()
+        _pool.putconn(con)
         return True
-    except:
+    except Exception:
         return False
+
+
 
 
 # =====================================================================
 #                       CONNECTION RETRY LOGIC
 # =====================================================================
 
-def attempt_connection_with_retry(max_attempts=3, delay=2):
+def attempt_connection_with_retry(max_attempts=3, delay=1):
     """
-    Safe function for UI:
-    Returns True if connected, False if all attempts failed.
+    Tries to create the connection pool.
+    NEVER sleeps or blocks the UI.
     """
 
-    for attempt in range(1, max_attempts + 1):
-        print(f"[DB] TRY {attempt}/{max_attempts}")
-        if is_connected_to_db():
-            print("[DB] Connection OK!")
-            return True
+    global _pool
 
-        time.sleep(delay)
+    # If pool already exists -> connection is OK
+    if _pool is not None:
+        return True
 
-    return False
+    try:
+        print("[DB] Creating pool (lazy init)...")
+        _pool = _create_pool()
+        return True
+
+    except Exception as e:
+        print("[DB] Pool creation failed:", e)
+        return False
+
 
 

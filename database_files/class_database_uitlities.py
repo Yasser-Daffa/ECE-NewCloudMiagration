@@ -72,7 +72,7 @@ class DatabaseUtilities:
 
         # Ping the database
         try:
-            self.cur.execute("SELECT 1;")
+            self.con.poll()
         except Exception:
             self._connect_fresh()
             return
