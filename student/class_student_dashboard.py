@@ -4,7 +4,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from PyQt6.QtCore import QTimer
 
 from PyQt6 import QtWidgets
-from database_files.cloud_database import is_connected_to_db
+
+from helper_files.db_worker import DbWorker
+from database_files.cloud_database import get_connection
+
 
 from student.class_student_utilities import StudentUtilities
 from admin.class_admin_utilities import AdminUtilities
@@ -123,7 +126,9 @@ class StudentDashboard(QtWidgets.QMainWindow):
         self.status_timer = QTimer(self)
         self.status_timer.timeout.connect(self.update_connection_status)
         self.status_timer.start(5000)
-        
+        # Track background threads to prevent premature destruction
+        self._connection_workers = []
+
 
     # -------------------------------
     # Initialize all sub-pages
@@ -216,10 +221,73 @@ class StudentDashboard(QtWidgets.QMainWindow):
         self.authentication_window.show()
 
 
+    #-------------- All about the connection status -----------------
     def update_connection_status(self):
+        """
+        Run DB connectivity test in a background thread.
+        Safely checks whether the database is reachable (online/offline)
+        without freezing or stuttering the UI.
+        """
+
+        def ping():
+            """
+            This function runs *inside a background thread*.
+
+            It performs a real connectivity test:
+            - Opens a lightweight connection to the cloud DB
+            - Executes a simple 'SELECT 1'
+            - Closes the connection
+
+            If this succeeds -> DB is online.
+            If it fails (network down, Supabase unreachable, etc.) -> offline.
+
+            NOTE:
+            - Because this is executed in a QThread, any delay or network lag
+            DOES NOT freeze the interface.
+            """
+
+            try:
+                # Try establishing a single direct connection
+                con, cur = get_connection(retries=1, delay=0)
+
+                # Minimal SQL query to test database responsiveness
+                cur.execute("SELECT 1;")
+
+                # Clean up resources
+                cur.close()
+                con.close()
+
+                return True  # Online
+
+            except Exception:
+                return False  # Offline
+
+
+    
+        # Create worker that will run ping() in a thread
+        worker = DbWorker(ping)
+
+
+        
+        # Store worker so it inside the list doesn't get destroyed
+        self._connection_workers.append(worker)
+
+        # When finished, it sends signal containing True/False.
+        worker.finished.connect(self.apply_connection_status)  # connected to the method that updates UI status bellow
+
+
+        # Remove worker from tracking list when done
+        worker.finished.connect(lambda _: self._connection_workers.remove(worker))
+
+        # Start the background thread.
+        # The UI remains fully responsive while the ping runs.
+        worker.start()
+
+
+    def apply_connection_status(self, online):
         """ updates the "online" label dynamicly 
         based on whether user is connected to db or not"""
-        if is_connected_to_db():
+        if online:
             self.ui.labelStudentStatus.setText("🟢Online") # <----- the label 
 
         else:
