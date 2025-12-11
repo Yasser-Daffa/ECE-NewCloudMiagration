@@ -86,9 +86,6 @@ The original design ran on SQLite and worked locally, but had issues:
 
 ---
 
-# System Architecture
-
-SystemArchitecture: |
   # System Architecture
 
   ```text
