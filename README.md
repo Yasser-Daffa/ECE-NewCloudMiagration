@@ -122,12 +122,12 @@ The original design ran on SQLite and worked locally, but had issues:
 
 # Installation (User)
 
-### 1. Download the release folder  
+### 1. Download  
 go to `releases`.
 Inside it you will a **setup file**. download the latest one always, as it has the most recent bug fixes
 
 ### 2. Run:
-launch the **setup.exe** file and proceed normally
+launch the **setup.exe** file and proceed normally with the installation
 
 ---
 
