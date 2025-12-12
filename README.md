@@ -123,12 +123,8 @@ The original design ran on SQLite and worked locally, but had issues:
 # Installation (User)
 
 ### 1. Download the release folder  
-go to `dir` folder -> then `output`.
+go to `releases`.
 Inside it you will a **setup file**. download the latest one always, as it has the most recent bug fixes
-
-Example path:
-dir/output_v2/setup.exe
- - *download this* ----------- ^^^^^
 
 ### 2. Run:
 launch the **setup.exe** file and proceed normally
